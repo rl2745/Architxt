@@ -11,7 +11,6 @@ open Ast
 %token <int> LITERAL
 %token <bool> BLIT
 %token <string> ID FLIT
-%token <string> ID
 %token <string> STRLIT (*added ID and STRLIT*)
 %token EOF
 (*need to add map and point*)
