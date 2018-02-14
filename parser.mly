@@ -7,13 +7,13 @@ open Ast
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN
 %token NOT INCR DECR EQ NEQ LT LEQ GT GEQ AND OR (* added incr and decr*)
 %token RETURN IF ELSE FOR WHILE INT BOOL FLOAT VOID
-%token STRING PERIOD CHAR (*added String and period, char*)
+%token STRING PERIOD CHAR POINT(*added String and period, char, point*)
 %token <int> LITERAL
 %token <bool> BLIT
 %token <string> ID FLIT
 %token <string> STRLIT (*added ID and STRLIT*)
 %token EOF
-(*need to add map and point*)
+(*need to add map*)
 
 %start program
 %type <Ast.program> program
@@ -61,7 +61,9 @@ typ:
   | BOOL  { Bool  }
   | FLOAT { Float }
   | VOID  { Void  }
-  (*need to add String, map and point*)
+  | STRING { String }
+  | POINT { Point }
+  (*added String and point; need to add map*)
 
 vdecl_list:
     /* nothing */    { [] }
@@ -110,7 +112,9 @@ expr:
   | ID ASSIGN expr   { Assign($1, $3)         }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN { $2                   }
-  (*need to add point and map and string*)
+  | STRINGLIT            { StringLit($1) }
+  | POINTLIT { $1 }
+  (*added string and point, need to add map*)
 
 args_opt:
     /* nothing */ { [] }
@@ -119,5 +123,8 @@ args_opt:
 args_list:
     expr                    { [$1] }
   | args_list COMMA expr { $3 :: $1 }
+
+(*POINTLIT:
+    LPAREN LPAREN bool RPAREN RPAREN    { POINT($3)}*)
 
   (*need to add point and map specific stuff*)

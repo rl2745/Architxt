@@ -41,14 +41,15 @@ rule token = parse
 | "true"   { BLIT(true)  }
 | "false"  { BLIT(false) }
 | "char"   { CHAR }
-| "string" { STRING } (*added string and char and reading string*)
+| "string" { STRING } 
+| "point"  { POINT }(*added string and char and reading string and point*)
 | '"'      { read_string (Buffer.create 17) lexbuf }
 | digits as lxm { LITERAL(int_of_string lxm) }
 | digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )? as lxm { FLIT(lxm) }
 | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']*     as lxm { ID(lxm) }
 | eof { EOF }
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
-(*added period, string, char, need to add point and map*)
+(*added period, string, char, point, need to add map*)
 
 and comment = parse
   "*/" { token lexbuf }

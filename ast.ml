@@ -6,7 +6,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
 
 type uop = Neg | Not | Incr | Decr (*added increment and decrement*)
 
-type typ = Int | Bool | Float | Void | String | Char (*added String and Char, need to add map, point*)
+type typ = Int | Bool | Float | Void | String | Char | Point (*added String, char, point; need to add map*)
 
 type bind = typ * string
 
@@ -21,7 +21,8 @@ type expr =
   | Call of string * expr list
   | Noexpr
   | StringLit of string
-  (* added String, need to add map, point, assign map, assign point, access...*)
+  | Point of bool
+  (* added String, point; need to add map, assign map, assign point, access...*)
 
 type stmt =
     Block of stmt list
@@ -70,7 +71,8 @@ let rec string_of_typ = function
   | Void -> "void"
   | String -> "string"
   | Char -> "char"
-  (*added String and char, need to add point, map*)
+  | Point -> "point"
+  (*added String, char, and point; need to add map*)
 
 let rec string_of_expr = function
     Literal(l) -> string_of_int l
@@ -86,7 +88,8 @@ let rec string_of_expr = function
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
   | StringLit(s) -> s
-  (*added String, need to add map, point*)
+  | Point(s) -> "(( "^ string_of_expr s^" ))" (* could change how its represented, just used this for now*)
+  (*added String and point; need to add map*)
 
 let rec string_of_stmt = function
     Block(stmts) ->
