@@ -7,7 +7,8 @@ let digits = digit+
 
 rule token = parse
   [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
-| "/#"     { comment lexbuf }           (* Comments *)
+| "/#"     { comment lexbuf }
+| "#"      { scomment lexbuf}                                (* Comments *)
 | '('      { LPAREN }
 | ')'      { RPAREN }
 | '{'      { LBRACE }
@@ -54,6 +55,10 @@ rule token = parse
 and comment = parse
   "#/" { token lexbuf }
 | _    { comment lexbuf }
+
+and scomment = partse
+  "\n" { token lexbuf }
+| _    { scomment lexbuf }
 
 (*added string parsing stuff from https://realworldocaml.org/v1/en/html/parsing-with-ocamllex-and-menhir.html*)
 and read_string buf =
