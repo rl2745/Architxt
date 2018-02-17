@@ -124,7 +124,8 @@ args_list:
     expr                    { [$1] }
   | args_list COMMA expr { $3 :: $1 }
 
-(*POINTLIT:
-    LPAREN LPAREN bool RPAREN RPAREN    { POINT($3)}*)
+
+POINTLIT:
+    LPAREN LPAREN bool RPAREN RPAREN    { POINT($3)}
 
   (*need to add point and map specific stuff*)
