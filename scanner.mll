@@ -7,7 +7,7 @@ let digits = digit+
 
 rule token = parse
   [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
-| "/*"     { comment lexbuf }           (* Comments *)
+| "/#"     { comment lexbuf }           (* Comments *)
 | '('      { LPAREN }
 | ')'      { RPAREN }
 | '{'      { LBRACE }
@@ -52,7 +52,7 @@ rule token = parse
 (*added period, string, char, point, need to add map*)
 
 and comment = parse
-  "*/" { token lexbuf }
+  "#/" { token lexbuf }
 | _    { comment lexbuf }
 
 (*added string parsing stuff from https://realworldocaml.org/v1/en/html/parsing-with-ocamllex-and-menhir.html*)
