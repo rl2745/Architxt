@@ -6,7 +6,7 @@ open Ast
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA PLUS MINUS TIMES DIVIDE ASSIGN
 %token NOT INCR DECR EQ NEQ LT LEQ GT GEQ AND OR (* added incr and decr*)
-%token RETURN IF ELSE FOR WHILE INT BOOL FLOAT VOID
+%token RETURN IF ELSE FOR WHILE INT BOOL FLOAT VOID NEW
 %token STRING PERIOD CHAR POINT(*added String and period, char, point*)
 %token <int> LITERAL
 %token <bool> BLIT
@@ -114,6 +114,11 @@ expr:
   | LPAREN expr RPAREN { $2                   }
   | STRINGLIT            { StringLit($1) }
   | POINTLIT { $1 }
+  | NEW primitive LBRACKET expr RBRACKET  { ArrayInit($2, $4) }
+  | DELETE ID                             { ArrayDelete($2) }
+  | ID LBRACKET expr RBRACKET ASSIGN expr { ArrayAssign($1, $3, $6) }
+  | ID LBRACKET expr RBRACKET             { ArrayAccess($1, $3) }
+
   (*added string and point, need to add map*)
 
 args_opt:

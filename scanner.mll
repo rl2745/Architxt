@@ -33,6 +33,8 @@ rule token = parse
 | "||"     { OR }
 | "!"      { NOT }
 | "if"     { IF }
+| "new"    { NEW }
+| "delete" { DELETE }
 | "else"   { ELSE }
 | "for"    { FOR }
 | "while"  { WHILE }
