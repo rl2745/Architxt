@@ -1,10 +1,10 @@
-/* Ocamlyacc parser for MicroC */
+(* Ocamlyacc parser for Architxt *)
 
 %{
 open Ast
 %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN
+%token SEMI LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA PLUS MINUS TIMES DIVIDE ASSIGN
 %token NOT INCR DECR EQ NEQ LT LEQ GT GEQ AND OR (* added incr and decr*)
 %token RETURN IF ELSE FOR WHILE INT BOOL FLOAT VOID
 %token STRING PERIOD CHAR POINT(*added String and period, char, point*)
@@ -36,7 +36,7 @@ program:
   decls EOF { $1 }
 
 decls:
-   /* nothing */ { ([], [])               }
+   (* nothing *) { ([], [])               }
  | decls vdecl { (($2 :: fst $1), snd $1) }
  | decls fdecl { (fst $1, ($2 :: snd $1)) }
 
@@ -49,7 +49,7 @@ fdecl:
 	 body = List.rev $8 } }
 
 formals_opt:
-    /* nothing */ { [] }
+    (* nothing *) { [] }
   | formal_list   { List.rev $1 }
 
 formal_list:
