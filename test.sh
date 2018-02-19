@@ -4,7 +4,7 @@
 #negative test test1-paren.arc
 test1='./toplevel.native test1-paren.arc'
 
-if [ test1 = "OKAY"]; then
+if [ test1 = "OKAY" ]; then
 	echo "NEGATIVE TEST FAILED"
 else
 	echo "NEGATIVE TEST OKAY"
