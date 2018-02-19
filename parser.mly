@@ -4,7 +4,7 @@
 open Ast
 %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA PLUS MINUS TIMES DIVIDE ASSIGN
+%token SEMI LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA PLUS MINUS TIMES DIVIDE ASSIGN DELETE
 %token NOT INCR DECR EQ NEQ LT LEQ GT GEQ AND OR (* added incr and decr*)
 %token RETURN IF ELSE FOR WHILE INT BOOL FLOAT VOID NEW
 %token STRING PERIOD CHAR POINT(*added String and period, char, point*)
@@ -112,9 +112,9 @@ expr:
   | ID ASSIGN expr   { Assign($1, $3)         }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN { $2                   }
-  | STRINGLIT            { StringLit($1) }
+  | STRLIT            { StringLit($1) }
   | POINTLIT { $1 }
-  | NEW primitive LBRACKET expr RBRACKET  { ArrayInit($2, $4) }
+  | NEW typ LBRACKET expr RBRACKET  { ArrayInit($2, $4) }
   | DELETE ID                             { ArrayDelete($2) }
   | ID LBRACKET expr RBRACKET ASSIGN expr { ArrayAssign($1, $3, $6) }
   | ID LBRACKET expr RBRACKET             { ArrayAccess($1, $3) }
@@ -131,6 +131,6 @@ args_list:
 
 
 POINTLIT:
-    LPAREN LPAREN bool RPAREN RPAREN    { POINT($3)}
+    LPAREN LPAREN BOOL RPAREN RPAREN    { POINT($3)}
 
   (*need to add point and map specific stuff*)
