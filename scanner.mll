@@ -60,7 +60,7 @@ and comment = parse
   "#/" { token lexbuf }
 | _    { comment lexbuf }
 
-and scomment = partse
+and scomment = parse
   "\n" { token lexbuf }
 | _    { scomment lexbuf }
 
