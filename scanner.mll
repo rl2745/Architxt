@@ -67,7 +67,7 @@ and scomment = parse
 (*added string parsing stuff from https://realworldocaml.org/v1/en/html/parsing-with-ocamllex-and-menhir.html*)
 and read_string buf =
   parse
-  | '"'       { STRING (Buffer.contents buf) }
+  | '"'       { STRLIT (Buffer.contents buf) }
   | '\\' '/'  { Buffer.add_char buf '/'; read_string buf lexbuf }
   | '\\' '\\' { Buffer.add_char buf '\\'; read_string buf lexbuf }
   | '\\' 'b'  { Buffer.add_char buf '\b'; read_string buf lexbuf }
@@ -79,5 +79,5 @@ and read_string buf =
     { Buffer.add_string buf (Lexing.lexeme lexbuf);
       read_string buf lexbuf
     }
-  | _ { raise (SyntaxError ("Illegal string character: " ^ Lexing.lexeme lexbuf)) }
-  | eof { raise (SyntaxError ("String is not terminated")) }
+  | _ { raise (Failure ("Illegal string character: " ^ Lexing.lexeme lexbuf)) }
+  | eof { raise (Failure ("String is not terminated")) }

@@ -1,19 +1,19 @@
-(* Ocamlyacc parser for Architxt *)
+/* Ocamlyacc parser for Architxt */
 
 %{
 open Ast
 %}
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA PLUS MINUS TIMES DIVIDE ASSIGN DELETE
-%token NOT INCR DECR EQ NEQ LT LEQ GT GEQ AND OR (* added incr and decr*)
+%token NOT INCR DECR EQ NEQ LT LEQ GT GEQ AND OR /* added incr and decr*/
 %token RETURN IF ELSE FOR WHILE INT BOOL FLOAT VOID NEW
-%token STRING PERIOD CHAR POINT(*added String and period, char, point*)
+%token STRING PERIOD CHAR POINT /*added String and period, char, point*/
 %token <int> LITERAL
 %token <bool> BLIT
 %token <string> ID FLIT
-%token <string> STRLIT (*added ID and STRLIT*)
+%token <string> STRLIT /*added ID and STRLIT*/
 %token EOF
-(*need to add map*)
+/*need to add map*/
 
 %start program
 %type <Ast.program> program
@@ -36,7 +36,7 @@ program:
   decls EOF { $1 }
 
 decls:
-   (* nothing *) { ([], [])               }
+   /* nothing */ { ([], [])               }
  | decls vdecl { (($2 :: fst $1), snd $1) }
  | decls fdecl { (fst $1, ($2 :: snd $1)) }
 
@@ -49,7 +49,7 @@ fdecl:
 	 body = List.rev $8 } }
 
 formals_opt:
-    (* nothing *) { [] }
+    /* nothing */ { [] }
   | formal_list   { List.rev $1 }
 
 formal_list:
@@ -63,7 +63,7 @@ typ:
   | VOID  { Void  }
   | STRING { String }
   | POINT { Point }
-  (*added String and point; need to add map*)
+  /*added String and point; need to add map*/
 
 vdecl_list:
     /* nothing */    { [] }
@@ -113,13 +113,13 @@ expr:
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN { $2                   }
   | STRLIT            { StringLit($1) }
-  | POINTLIT { $1 }
+  | point_lit { $1 }
   | NEW typ LBRACKET expr RBRACKET  { ArrayInit($2, $4) }
   | DELETE ID                             { ArrayDelete($2) }
   | ID LBRACKET expr RBRACKET ASSIGN expr { ArrayAssign($1, $3, $6) }
   | ID LBRACKET expr RBRACKET             { ArrayAccess($1, $3) }
 
-  (*added string and point, need to add map*)
+  /*added string and point, need to add map*/
 
 args_opt:
     /* nothing */ { [] }
@@ -130,7 +130,7 @@ args_list:
   | args_list COMMA expr { $3 :: $1 }
 
 
-POINTLIT:
-    LPAREN LPAREN BOOL RPAREN RPAREN    { POINT($3)}
+point_lit:
+    LPAREN LPAREN expr RPAREN RPAREN    { PointLit($3)}
 
-  (*need to add point and map specific stuff*)
+  /*need to add point and map specific stuff*/
