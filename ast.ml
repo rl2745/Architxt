@@ -21,7 +21,7 @@ type expr =
   | Call of string * expr list
   | Noexpr
   | StringLit of string
-  | PointLit of expr
+  | PointLit of expr * expr
   | ArrayInit of typ * expr
   | ArrayDelete of string
   | ArrayAssign of string * expr * expr
@@ -93,7 +93,7 @@ let rec string_of_expr = function
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
   | StringLit(s) -> s
-  | PointLit(s) -> "(( "^ string_of_expr s ^" ))" 
+  | PointLit(s, c) -> "( "^ string_of_expr s ^ "," ^ string_of_expr c ^ " )" 
   | ArrayAccess(s, e) -> s ^ "[" ^ string_of_expr e ^ "]"
   | ArrayAssign(s, e1, e2) ->
       s ^ "[" ^string_of_expr e1 ^"] ="^ string_of_expr e2

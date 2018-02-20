@@ -4,10 +4,10 @@
 open Ast
 %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA PLUS MINUS TIMES DIVIDE ASSIGN DELETE
+%token SEMI LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA PLUS MINUS TIMES DIVIDE ASSIGN DELETE TILDA
 %token NOT INCR DECR EQ NEQ LT LEQ GT GEQ AND OR /* added incr and decr*/
 %token RETURN IF ELSE FOR WHILE INT BOOL FLOAT VOID NEW
-%token STRING PERIOD CHAR POINT /*added String and period, char, point*/
+%token STRING PERIOD CHAR POINT ARRAY /*added String and period, char, point*/
 %token <int> LITERAL
 %token <bool> BLIT
 %token <string> ID FLIT
@@ -118,6 +118,8 @@ expr:
   | DELETE ID                             { ArrayDelete($2) }
   | ID LBRACKET expr RBRACKET ASSIGN expr { ArrayAssign($1, $3, $6) }
   | ID LBRACKET expr RBRACKET             { ArrayAccess($1, $3) }
+  | expr PLUS PLUS                        { Unop(Incr, $1) }
+  | expr MINUS MINUS                      { Unop(Decr, $1) }
 
   /*added string and point, need to add map*/
 
@@ -131,6 +133,6 @@ args_list:
 
 
 point_lit:
-    LPAREN LPAREN expr RPAREN RPAREN    { PointLit($3)}
+    LPAREN expr COMMA expr RPAREN    { PointLit($2, $4)}
 
   /*need to add point and map specific stuff*/
