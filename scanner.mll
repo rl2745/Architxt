@@ -47,7 +47,8 @@ rule token = parse
 | "false"  { BLIT(false) }
 | "char"   { CHAR }
 | "string" { STRING } 
-| "point"  { POINT }(*added string and char and reading string and point*)
+| "point"  { POINT }
+| "Map"    { MAP } (*added string and char and reading string and point*)
 | '"'      { read_string (Buffer.create 17) lexbuf }
 | digits as lxm { LITERAL(int_of_string lxm) }
 | digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )? as lxm { FLIT(lxm) }
