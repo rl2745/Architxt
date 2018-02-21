@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #negative test test1-paren.arc
 test1=$(./toplevel.native tests/test1-paren.arc)
 if [ "$(grep -c "OKAY" <<< $test1)" == 1 ]; then

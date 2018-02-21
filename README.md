@@ -6,6 +6,7 @@ Tristan Orlofski (tio2001@columbia.edu) - Language Guru
 
 - to compile, run $make and this should give you toplevel.native
 	* note that the ast.ml pretty printing prints "OKAY" at the end of an accepted file for testing purposes
+	* note that while ocamlbuild does not throw any warnings, if one compiles the .mly file by itself, it may return warnings that x token is unused. This is expected because we do plan on using these tokens in the future.
 - to execute the program, run $./toplevel.native ____.arc where ____ is an .arc file
 - to test, run $./testall.sh
 	all of the tests should return #: POSITIVE/NEGATIVE TEST WORKED with # as the test number
