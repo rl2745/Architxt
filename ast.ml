@@ -6,7 +6,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
 
 type uop = Neg | Not | Incr | Decr (*added increment and decrement*)
 
-type typ = Int | Bool | Float | Void | String | Char | Point | ArrayType of typ (*added String, char, point; need to add map*)
+type typ = Int | Bool | Float | Void | String | Char | Point | MapType | ArrayType of typ (*added String, char, point; need to add map*)
 
 type bind = typ * string
 
@@ -26,6 +26,7 @@ type expr =
   | ArrayDelete of string
   | ArrayAssign of string * expr * expr
   | ArrayAccess of string * expr
+  | MapInit of expr * expr
   (* added String, point; need to add map, assign map, assign point, access...*)
 
 type stmt =
@@ -77,6 +78,7 @@ let rec string_of_typ = function
   | Char -> "char"
   | Point -> "point"
   | ArrayType(t) -> "ArrayType:" ^ string_of_typ t
+  | MapType -> "MapType:int"
   (*added String, char, and point; need to add map*)
 
 let rec string_of_expr = function
@@ -99,6 +101,7 @@ let rec string_of_expr = function
       s ^ "[" ^string_of_expr e1 ^"] ="^ string_of_expr e2
   | ArrayInit(typ, len) -> string_of_typ typ ^ "[" ^ string_of_expr len ^ "]"
   | ArrayDelete(s) -> "delete " ^ s
+  | MapInit(e1, e2) -> "Map" ^ "[" ^ string_of_expr e1 ^ "," ^ string_of_expr e2 ^ "]"
   (* could change how its represented, just used this for now*)
   (*added String and point; need to add map*)
 
