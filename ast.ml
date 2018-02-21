@@ -6,7 +6,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
 
 type uop = Neg | Not | Incr | Decr (*added increment and decrement*)
 
-type typ = Int | Bool | Float | Void | String | Char | Point | MapType | ArrayType of typ (*added String, char, point; need to add map*)
+type typ = Int | Bool | Float | Void | String | Char | Point | Map | ArrayType of typ (*added String, char, point; need to add map*)
 
 type bind = typ * string
 
@@ -78,7 +78,7 @@ let rec string_of_typ = function
   | Char -> "char"
   | Point -> "point"
   | ArrayType(t) -> "ArrayType:" ^ string_of_typ t
-  | MapType -> "mapType"
+  | Map -> "map"
   (*added String, char, and point; need to add map*)
 
 let rec string_of_expr = function
