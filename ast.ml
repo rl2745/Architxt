@@ -78,7 +78,7 @@ let rec string_of_typ = function
   | Char -> "char"
   | Point -> "point"
   | ArrayType(t) -> "ArrayType:" ^ string_of_typ t
-  | MapType -> "MapType:int"
+  | MapType -> "mapType"
   (*added String, char, and point; need to add map*)
 
 let rec string_of_expr = function
