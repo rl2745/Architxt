@@ -7,7 +7,7 @@ open Ast
 %token SEMI LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA PLUS MINUS TIMES DIVIDE ASSIGN DELETE
 %token NOT INCR DECR EQ NEQ LT LEQ GT GEQ AND OR /* added incr and decr*/
 %token RETURN IF ELSE FOR WHILE INT BOOL FLOAT VOID NEW
-%token STRING PERIOD CHAR POINT ARRAY /*added String and period, char, point*/
+%token STRING PERIOD CHAR POINT ARRAY MAP /*added String and period, char, point*/
 %token <int> LITERAL
 %token <bool> BLIT
 %token <string> ID FLIT
@@ -63,6 +63,7 @@ typ:
   | VOID  { Void  }
   | STRING { String }
   | POINT { Point }
+  | MAP  { Map }
   /*added String and point; need to add map*/
 
 vdecl_list:
@@ -120,7 +121,7 @@ expr:
   | ID LBRACKET expr RBRACKET             { ArrayAccess($1, $3) }
   | expr PLUS PLUS                        { Unop(Incr, $1) }
   | expr MINUS MINUS                      { Unop(Decr, $1) }
-
+  | MAP LBRACKET expr COMMA expr RBRACKET { MapInit($3, $5) }
   /*added string and point, need to add map*/
 
 args_opt:
