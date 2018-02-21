@@ -121,7 +121,7 @@ expr:
   | ID LBRACKET expr RBRACKET             { ArrayAccess($1, $3) }
   | expr PLUS PLUS                        { Unop(Incr, $1) }
   | expr MINUS MINUS                      { Unop(Decr, $1) }
-  | MAP LBRACKET expr COMMA expr RBRACKET { MapInit($3, $5) }
+  | map_init { $1 }
   /*added string and point, need to add map*/
 
 args_opt:
@@ -135,5 +135,8 @@ args_list:
 
 point_lit:
     LPAREN expr COMMA expr RPAREN    { PointLit($2, $4)}
+
+map_init:
+    LBRACKET expr COMMA expr RBRACKET { MapInit($2, $4)}
 
   /*need to add point and map specific stuff*/
