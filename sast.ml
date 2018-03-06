@@ -13,6 +13,14 @@ and sx =
   | SAssign of string * sexpr
   | SCall of string * sexpr list
   | SNoexpr
+  | SStringLit of string
+  | SPointLit of sexpr * sexpr
+  | SArrayInit of typ * sexpr
+  | SArrayDelete of string
+  | SArrayAssign of string * sexpr * sexpr
+  | SArrayAccess of string * sexpr
+  | SMapInit of sexpr * sexpr
+  (*add String, Point, ArrayInit, Delete, Access, Assign, MapInit*)
 
 type sstmt =
     SBlock of sstmt list
@@ -48,7 +56,16 @@ let rec string_of_sexpr (t, e) =
   | SCall(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
   | SNoexpr -> ""
-				  ) ^ ")"				     
+				  ) ^ ")"
+  | SStringLit(s) -> s
+  | SPointLit(s, c) -> "( "^ string_of_sexpr s ^ "," ^ string_of_sexpr c ^ " )" 
+  | SArrayAccess(s, e) -> s ^ "[" ^ string_of_sexpr e ^ "]"
+  | SArrayAssign(s, e1, e2) ->
+      s ^ "[" ^string_of_sexpr e1 ^"] ="^ string_of_sexpr e2
+  | SArrayInit(typ, len) -> string_of_typ typ ^ "[" ^ string_of_sexpr len ^ "]"
+  | SArrayDelete(s) -> "delete " ^ s
+  | SMapInit(e1, e2) -> "Map" ^ "[" ^ string_of_sexpr e1 ^ "," ^ string_of_sexpr e2 ^ "]"				
+        (* add string, point, arrayaccess, assign, init, delete, mapinit*)     
 
 let rec string_of_sstmt = function
     SBlock(stmts) ->
