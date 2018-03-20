@@ -39,12 +39,29 @@ let check (globals, functions) =
     ( StringMap.add "propagate" { typ = Void; fname = "propagate"; formals = [(Point, "p")];
       locals = []; body = [] }
     ( StringMap.add "display" { typ = Void; fname = "display"; formals = [(Map, "m")];
-      locals = []; body = [] }
+      locals = []; body = [] }))))
   in
 
+  (*add_func checks to make sure things aren't built in and things aren't duplicated*)
+  let add_func map fd = 
+    let built_in_err = "function " ^ fd.fname ^ " may not be defined"
+    and dup_err = "duplicate function " ^ fd.fname
+    and make_err er = raise (Failure er)
+    and n = fd.fname (* Name of the function *)
+    in match fd with (* No duplicate functions or redefinitions of built-ins *)
+         _ when StringMap.mem n built_in_decls -> make_err built_in_err
+       | _ when StringMap.mem n map -> make_err dup_err  
+       | _ ->  StringMap.add n fd map 
+  in
   (*add function name to symbol table*)
-  (*collect function names into one symbol table*)
-  (*return function from symbol table*)
+  let function_decls = List.fold_left add_func built_in_decls functions
+  in
+  
+  (* Return a function from our symbol table *)
+  let find_func s = 
+    try StringMap.find s function_decls
+    with Not_found -> raise (Failure ("unrecognized function " ^ s))
+  in
   (*checkbinds on formals and locals to make sure formals or locals are not void/dup*)
   (*build local symbol table of variables for function*)
   (*return local variable from local symbol table*)
