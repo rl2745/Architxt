@@ -55,8 +55,6 @@ let rec string_of_sexpr (t, e) =
   | SAssign(v, e) -> v ^ " = " ^ string_of_sexpr e
   | SCall(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
-  | SNoexpr -> ""
-				  ) ^ ")"
   | SStringLit(s) -> s
   | SPointLit(s, c) -> "( "^ string_of_sexpr s ^ "," ^ string_of_sexpr c ^ " )" 
   | SArrayAccess(s, e) -> s ^ "[" ^ string_of_sexpr e ^ "]"
@@ -64,9 +62,11 @@ let rec string_of_sexpr (t, e) =
       s ^ "[" ^string_of_sexpr e1 ^"] ="^ string_of_sexpr e2
   | SArrayInit(typ, len) -> string_of_typ typ ^ "[" ^ string_of_sexpr len ^ "]"
   | SArrayDelete(s) -> "delete " ^ s
-  | SMapInit(e1, e2) -> "Map" ^ "[" ^ string_of_sexpr e1 ^ "," ^ string_of_sexpr e2 ^ "]"				
+  | SMapInit(e1, e2) -> "Map" ^ "[" ^ string_of_sexpr e1 ^ "," ^ string_of_sexpr e2 ^ "]"       
         (* add string, point, arrayaccess, assign, init, delete, mapinit*)     
-
+  | SNoexpr -> ""
+				  ) ^ ")"
+  
 let rec string_of_sstmt = function
     SBlock(stmts) ->
       "{\n" ^ String.concat "" (List.map string_of_sstmt stmts) ^ "}\n"
