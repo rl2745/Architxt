@@ -84,6 +84,8 @@ let check (globals, functions) =
       let rec expr = function
         Literal  l -> (Int, SLiteral l)
       | Fliteral l -> (Float, SFliteral l)
+      | StringLit l -> (String, SStringLit l)
+      | Noexpr -> (Void, SNoexpr)
       | BoolLit l  -> (Bool, SBoolLit l)
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier s, SId s)
@@ -134,6 +136,29 @@ let check (globals, functions) =
           in 
           let args' = List.map2 check_call fd.formals args
           in (fd.typ, SCall(fname, args'))
+      | PointLit(e1, e2) as e ->
+          let (t1, e1') = expr e1
+          and (t2, e2') = expr e2 in
+          if (t1 != Bool) then
+            raise (Failure ("expecting bool but received " ^ string_of_expr e1))
+          else 
+          if (t2 != String) then
+            raise (Failure ( "expecting string but received " ^ string_of_expr e2))
+          else
+            (Point, SPointLit((t1, e1'), (t2, e2'))
+      | ArrayAccess(s, e) as access -> 
+          let nametype = type_of_identifier s and (indxtyp, indx) = expr e in
+          if (indxtyp != Int) then
+            raise (Failure ("expecting int but received" ^ string_of_expr e))
+          else
+          if (nametype != ArrayType) then
+            raise (Failure ("expecting array but received" ^ string_of_expr s))
+          else 
+            (ArrayAccess, SArrayAccess(expr s, expr e))
+
+
+
+
     in
 
     let check_bool_expr e = 
