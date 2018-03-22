@@ -80,7 +80,9 @@ let check (globals, functions) =
       try StringMap.find s symbols
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
-  (*return semantically checked expression with a type -- NEED TO ADD VARIABLE DECLARATION WHEREVER*)
+
+  (*return semantically checked expression with a type -- NEED TO ADD VARIABLE DECLARATION WHEREVER
+    specifically returns a sexpr, which is a (typ, sx) tuple, where typ is a type and sx is semantically checked expr*)
       let rec expr = function
         Literal  l -> (Int, SLiteral l)
       | Fliteral l -> (Float, SFliteral l)
@@ -140,21 +142,38 @@ let check (globals, functions) =
           let (t1, e1') = expr e1
           and (t2, e2') = expr e2 in
           if (t1 != Bool) then
-            raise (Failure ("expecting bool but received " ^ string_of_expr e1))
+            raise (Failure ("expecting bool but received " ^ string_of_expr e1 ^ "in Point " ^ string_of_expr e))
           else 
           if (t2 != String) then
-            raise (Failure ( "expecting string but received " ^ string_of_expr e2))
+            raise (Failure ( "expecting string but received " ^ string_of_expr e2 ^ "in Point " ^ string_of_expr e))
           else
             (Point, SPointLit((t1, e1'), (t2, e2'))
       | ArrayAccess(s, e) as access -> 
           let nametype = type_of_identifier s and (indxtyp, indx) = expr e in
           if (indxtyp != Int) then
-            raise (Failure ("expecting int but received" ^ string_of_expr e))
+            raise (Failure ("expecting int but received" ^ string_of_expr e ^ "in Array " ^ string_of_expr access))
           else
           if (nametype != ArrayType) then
-            raise (Failure ("expecting array but received" ^ string_of_expr s))
+            raise (Failure ("expecting array but received" ^ string_of_expr s ^ "in Array " ^ string_of_expr access))
           else 
             (ArrayAccess, SArrayAccess(expr s, expr e))
+      | ArrayAssign(s, index, e) as assign -> let nametype = type_of_identifier s 
+          and (itype, sitype) = expr index and (etyp, setyp) = expr e in
+          if (itype != Int) then 
+            raise (Failure ("expecting int but received" ^ string_of_expr e ^ "in Array " ^ string_of_expr access))
+          else
+          if (nametype != ArrayType) then
+            raise (Failure ("expecting array but received" ^ string_of_expr s ^ "in Array " ^ string_of_expr access))
+          else let err = "expecting " ^ string_of_typ s ^
+              " but indexing " ^ string_of_typ etyp ^ " in Array " ^ string_of_expr assign 
+              in (check_assign nametype etyp err, SArrayAssign(expr s, expr index, expr e))
+      | MapInit(x, y) as map -> let (xt, xs) = expr x and (yt, ys) = expr y in
+          if (xt != Int) then
+            raise (Failure ( "expecting int but received " ^ string_of_expr x ^ "in Map " ^ string_of_expr map))
+          else
+          if (yt != Int) then
+            raise (Failure ( "expecting int but received " ^ string_of_expr y ^ "in Map " ^ string_of_expr e))
+          else (Map, SMapInit((xt, xs), (yt, yx))
 
 
 
