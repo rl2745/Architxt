@@ -49,6 +49,8 @@ rule token = parse
 | "string" { STRING } 
 | "point"  { POINT }
 | "Map"    { MAP } (*added string and char and reading string and point*)
+| "surface" { SURFACE }
+| "name"   { NAME }
 | '"'      { read_string (Buffer.create 17) lexbuf }
 | digits as lxm { LITERAL(int_of_string lxm) }
 | digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )? as lxm { FLIT(lxm) }

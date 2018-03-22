@@ -34,13 +34,13 @@ let check (globals, functions) =
   	StringMap.add "print_i" { typ = Void; fname = "print_i"; formals = [(Int, "x")];
       locals = []; body = [] } 
     ( StringMap.add "print" { typ = Void; fname = "print"; formals = [(String, "x")];
-      locals = []; body = [] }
+      locals = []; body = [] })(* temp removal to just make sure string works
     ( StringMap.add "fill" { typ = Void; fname = "fill"; formals = [(Int, "x"); (Int, "y"); (Point, "p")];
       locals = []; body = [] }
     ( StringMap.add "propagate" { typ = Void; fname = "propagate"; formals = [(Point, "p")];
       locals = []; body = [] }
     ( StringMap.add "display" { typ = Void; fname = "display"; formals = [(Map, "m")];
-      locals = []; body = [] }))))
+      locals = []; body = [] }))))*)
   in
 
   (*add_func checks to make sure things aren't built in and things aren't duplicated*)
@@ -80,7 +80,9 @@ let check (globals, functions) =
       try StringMap.find s symbols
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
-  (*return semantically checked expression with a type -- NEED TO ADD VARIABLE DECLARATION WHEREVER*)
+
+  (*return semantically checked expression with a type -- NEED TO ADD VARIABLE DECLARATION WHEREVER
+    specifically returns a sexpr, which is a (typ, sx) tuple, where typ is a type and sx is semantically checked expr*)
       let rec expr = function
         Literal  l -> (Int, SLiteral l)
       | Fliteral l -> (Float, SFliteral l)
@@ -140,21 +142,48 @@ let check (globals, functions) =
           let (t1, e1') = expr e1
           and (t2, e2') = expr e2 in
           if (t1 != Bool) then
-            raise (Failure ("expecting bool but received " ^ string_of_expr e1))
+            raise (Failure ("expecting bool but received " ^ string_of_typ t1 ^ "in Point " ^ string_of_expr e))
           else 
           if (t2 != String) then
-            raise (Failure ( "expecting string but received " ^ string_of_expr e2))
+            raise (Failure ( "expecting string but received " ^ string_of_typ t2 ^ "in Point " ^ string_of_expr e))
           else
-            (Point, SPointLit((t1, e1'), (t2, e2'))
+            (Point, SPointLit((t1, e1'), (t2, e2')))
       | ArrayAccess(s, e) as access -> 
           let nametype = type_of_identifier s and (indxtyp, indx) = expr e in
           if (indxtyp != Int) then
-            raise (Failure ("expecting int but received" ^ string_of_expr e))
+            raise (Failure ("expecting int but received" ^ string_of_typ indxtyp ^ "in Array " ^ string_of_expr access))
           else
           if (nametype != ArrayType) then
-            raise (Failure ("expecting array but received" ^ string_of_expr s))
+            raise (Failure ("expecting array but received" ^ string_of_typ nametype ^ "in Array " ^ string_of_expr access))
           else 
             (ArrayAccess, SArrayAccess(expr s, expr e))
+      | ArrayAssign(s, index, e) as assign -> let nametype = type_of_identifier s 
+          and (itype, sitype) = expr index and (etyp, setyp) = expr e in
+          if (itype != Int) then 
+            raise (Failure ("expecting int but received" ^ string_of_typ itype ^ "in Array " ^ string_of_expr assign))
+          else
+          if (nametype != ArrayType) then
+            raise (Failure ("expecting array but received" ^ string_of_typ nametype ^ "in Array " ^ string_of_expr assign))
+          else let err = "expecting " ^ string_of_typ s ^
+              " but indexing " ^ string_of_typ etyp ^ " in Array " ^ string_of_expr assign 
+              in (check_assign nametype etyp err, SArrayAssign(expr s, expr index, expr e))
+      | MapInit(x, y) as map -> let (xt, xs) = expr x and (yt, ys) = expr y in
+          if (xt != Int) then
+            raise (Failure ( "expecting int but received " ^ string_of_typ xt ^ "in Map " ^ string_of_expr map))
+          else
+          if (yt != Int) then
+            raise (Failure ( "expecting int but received " ^ string_of_typ yt ^ "in Map " ^ string_of_expr map))
+          else (Map, SMapInit((xt, xs), (yt, yx)))
+      | PointAssign(s, p, e) as point -> let nametype = type_of_identifier s and (etype, setype) = expr e in
+        if (nametype != Point) then
+          raise (Failure ( string_of_typ nametype ^ "is not a Point"))
+        else
+        if ((p == Surface) && (etype != Bool)) then 
+          raise (Failure ( "expecting bool but received " ^ string_of_typ etype ^ "in Point " ^ string_of_expr point))
+        else
+        if ((p == Name) && (etype != String)) then
+          raise (Failure ( "expecting string but received " ^ string_of_typ etype ^ "in Point " ^ string_of_expr point))
+        else (Point, SPointAssign(s, p, (etype, setype))
 
 
 

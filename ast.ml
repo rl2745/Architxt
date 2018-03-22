@@ -3,6 +3,8 @@
 
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
           And | Or
+(* point types = surface, name *)
+type ptyp = Surface | Name
 
 type uop = Neg | Not | Incr | Decr (*added increment and decrement*)
 
@@ -27,6 +29,8 @@ type expr =
   | ArrayAssign of string * expr * expr
   | ArrayAccess of string * expr
   | MapInit of expr * expr
+  | PointAssign of string * ptyp * expr
+  | PointAccess of string * ptyp
   (* added String, point; need to add map, assign map, assign point, access...*)
 
 type stmt =
@@ -81,6 +85,10 @@ let rec string_of_typ = function
   | Map -> "map"
   (*added String, char, and point; need to add map*)
 
+let string_of_ptyp = function
+    Surface -> "surface"
+  | Name -> "name"
+
 let rec string_of_expr = function
     Literal(l) -> string_of_int l
   | Fliteral(l) -> l
@@ -102,6 +110,8 @@ let rec string_of_expr = function
   | ArrayInit(typ, len) -> string_of_typ typ ^ "[" ^ string_of_expr len ^ "]"
   | ArrayDelete(s) -> "delete " ^ s
   | MapInit(e1, e2) -> "Map" ^ "[" ^ string_of_expr e1 ^ "," ^ string_of_expr e2 ^ "]"
+  | PointAssign(id, t, e) -> id ^ "." ^ string_of_ptyp t ^ "=" ^ string_of_expr e
+  | PointAccess(id, t) -> id ^ "." ^ string_of_ptyp t
   (* could change how its represented, just used this for now*)
   (*added String and point; need to add map*)
 

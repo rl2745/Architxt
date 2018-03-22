@@ -20,6 +20,8 @@ and sx =
   | SArrayAssign of string * sexpr * sexpr
   | SArrayAccess of string * sexpr
   | SMapInit of sexpr * sexpr
+  | SPointAssign of string * ptyp * sexpr
+  | SPointAccess of string * ptyp
   (*add String, Point, ArrayInit, Delete, Access, Assign, MapInit*)
 
 type sstmt =
@@ -66,6 +68,8 @@ let rec string_of_sexpr (t, e) =
         (* add string, point, arrayaccess, assign, init, delete, mapinit*)     
   | SNoexpr -> ""
 				  ) ^ ")"
+  | SPointAssign(id, t, e) -> id ^ "." ^ string_of_ptyp t ^ "=" ^ string_of_sexpr e
+  | SPointAccess(id, t) -> id ^ "." ^ string_of_ptyp t
   
 let rec string_of_sstmt = function
     SBlock(stmts) ->
