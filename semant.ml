@@ -147,7 +147,7 @@ let check (globals, functions) =
           if (t2 != String) then
             raise (Failure ( "expecting string but received " ^ string_of_expr e2 ^ "in Point " ^ string_of_expr e))
           else
-            (Point, SPointLit((t1, e1'), (t2, e2'))
+            (Point, SPointLit((t1, e1'), (t2, e2')))
       | ArrayAccess(s, e) as access -> 
           let nametype = type_of_identifier s and (indxtyp, indx) = expr e in
           if (indxtyp != Int) then
@@ -173,7 +173,7 @@ let check (globals, functions) =
           else
           if (yt != Int) then
             raise (Failure ( "expecting int but received " ^ string_of_expr y ^ "in Map " ^ string_of_expr e))
-          else (Map, SMapInit((xt, xs), (yt, yx))
+          else (Map, SMapInit((xt, xs), (yt, yx)))
 
 
 

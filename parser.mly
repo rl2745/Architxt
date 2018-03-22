@@ -4,10 +4,10 @@
 open Ast
 %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA PLUS MINUS TIMES DIVIDE ASSIGN DELETE
+%token SEMI LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA PLUS MINUS TIMES DIVIDE ASSIGN DELETE 
 %token NOT INCR DECR EQ NEQ LT LEQ GT GEQ AND OR /* added incr and decr*/
 %token RETURN IF ELSE FOR WHILE INT BOOL FLOAT VOID NEW
-%token STRING PERIOD CHAR POINT ARRAY MAP /*added String and period, char, point*/
+%token STRING PERIOD CHAR POINT ARRAY MAP SURFACE NAME /*added String and period, char, point*/
 %token <int> LITERAL
 %token <bool> BLIT
 %token <string> ID FLIT
@@ -20,6 +20,7 @@ open Ast
 
 %nonassoc NOELSE
 %nonassoc ELSE
+%nonassoc SURFACE NAME
 %right ASSIGN
 %left OR
 %left AND
@@ -122,6 +123,10 @@ expr:
   | expr PLUS PLUS                        { Unop(Incr, $1) }
   | expr MINUS MINUS                      { Unop(Decr, $1) }
   | map_init { $1 }
+  | ID PERIOD SURFACE ASSIGN expr            { PixelAssign($1, Surface, $5)}
+  | ID PERIOD SURFACE                        { PixelAccess($1, Surface)}
+  | ID PERIOD NAME ASSIGN expr               { PixelAssign($1, Name, $5)}
+  | ID PERIOD NAME                           { PixelAccess($1, Name)}
   /*added string and point, need to add map*/
 
 args_opt:
