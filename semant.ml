@@ -184,6 +184,12 @@ let check (globals, functions) =
         if ((p == Name) && (etype != String)) then
           raise (Failure ( "expecting string but received " ^ string_of_typ etype ^ "in Point " ^ string_of_expr point))
         else (Point, SPointAssign(s, p, (etype, setype))
+      | PointAccess(s, p) as point -> let nametype = type_of_identifier s in
+        if (nametype != Point) then
+          raise (Failure ( string_of_typ nametype ^ "is not a Point"))
+        else (*parser already checks if it's surface or name*)
+        (Point, PointAccess(s, p))
+
 
 
 
