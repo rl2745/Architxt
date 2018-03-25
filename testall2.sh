@@ -165,14 +165,14 @@ LLIFail() {
 
 which "$LLI" >> $globallog || LLIFail
 
-#Include the hellow world file here
+#Include the hello world file here
 
-# if [ ! -f printbig.o ]
-# then
-#     echo "Could not find printbig.o"
-#     echo "Try \"make printbig.o\""
-#     exit 1
-# fi
+if [ ! -f helloworld.o ]
+then
+    echo "Could not find helloworld.o"
+    echo "Try \"make helloworld.o\""
+    exit 1
+fi
 
 if [ $# -ge 1 ]
 then
