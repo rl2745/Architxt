@@ -170,12 +170,17 @@ let check (globals, functions) =
       | ArrayInit(typ, len) as init -> let nametype = type_of_identifier typ 
           and (itype, stype) = expr len in
           if (itype != Int) then
-            raise (Failure ("expecting int but received" ^ string_of_typ itype ^ " in Array " ^ string_of_expr assign))
+            raise (Failure ("expecting int but received" ^ string_of_typ itype ^ " in Array " ^ string_of_expr init))
           else
           if (nametype != ArrayType) then
             raise (Failure ("expecting array but received " ^ string_of_typ nametype ^ " in Array " ^ string_of_expr init))
           else
             (ArrayInit, SArrayInit(expr typ, expr len))
+      | ArrayDelete(s) as del -> let nametype = type_of_identifier s in
+          if (nameType != ArrayType) then
+            raise (Failure ("expecting array but received " ^ string_of_typ nameType ^ " in Array " ^ string_of_expr del))
+          else
+            (ArrayDelete, SArrayDelete(expr s))
       | MapInit(x, y) as map -> let (xt, xs) = expr x and (yt, ys) = expr y in
           if (xt != Int) then
             raise (Failure ( "expecting int but received " ^ string_of_typ xt ^ "in Map " ^ string_of_expr map))
