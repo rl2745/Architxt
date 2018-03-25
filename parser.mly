@@ -34,7 +34,7 @@ open Ast
 %%
 
 program:
-  decls EOF { $1 }
+  decls EOF { let (fst, snd) = $1 in (List.rev fst, List.rev snd) }
 
 decls:
    /* nothing */ { ([], [])               }
