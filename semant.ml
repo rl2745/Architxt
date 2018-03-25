@@ -151,22 +151,31 @@ let check (globals, functions) =
       | ArrayAccess(s, e) as access -> 
           let nametype = type_of_identifier s and (indxtyp, indx) = expr e in
           if (indxtyp != Int) then
-            raise (Failure ("expecting int but received" ^ string_of_typ indxtyp ^ "in Array " ^ string_of_expr access))
+            raise (Failure ("expecting int but received " ^ string_of_typ indxtyp ^ "in Array " ^ string_of_expr access))
           else
           if (nametype != ArrayType) then
-            raise (Failure ("expecting array but received" ^ string_of_typ nametype ^ "in Array " ^ string_of_expr access))
+            raise (Failure ("expecting array but received " ^ string_of_typ nametype ^ "in Array " ^ string_of_expr access))
           else 
             (ArrayAccess, SArrayAccess(expr s, expr e))
       | ArrayAssign(s, index, e) as assign -> let nametype = type_of_identifier s 
           and (itype, sitype) = expr index and (etyp, setyp) = expr e in
           if (itype != Int) then 
-            raise (Failure ("expecting int but received" ^ string_of_typ itype ^ "in Array " ^ string_of_expr assign))
+            raise (Failure ("expecting int but received " ^ string_of_typ itype ^ " in Array " ^ string_of_expr assign))
           else
           if (nametype != ArrayType) then
-            raise (Failure ("expecting array but received" ^ string_of_typ nametype ^ "in Array " ^ string_of_expr assign))
+            raise (Failure ("expecting array but received " ^ string_of_typ nametype ^ " in Array " ^ string_of_expr assign))
           else let err = "expecting " ^ string_of_typ s ^
               " but indexing " ^ string_of_typ etyp ^ " in Array " ^ string_of_expr assign 
               in (check_assign nametype etyp err, SArrayAssign(expr s, expr index, expr e))
+      | ArrayInit(typ, len) as init -> let nametype = type_of_identifier typ 
+          and (itype, stype) = expr len in
+          if (itype != Int) then
+            raise (Failure ("expecting int but received" ^ string_of_typ itype ^ " in Array " ^ string_of_expr assign))
+          else
+          if (nametype != ArrayType) then
+            raise (Failure ("expecting array but received " ^ string_of_typ nametype ^ " in Array " ^ string_of_expr init))
+          else
+            (ArrayInit, SArrayInit(expr typ, expr len))
       | MapInit(x, y) as map -> let (xt, xs) = expr x and (yt, ys) = expr y in
           if (xt != Int) then
             raise (Failure ( "expecting int but received " ^ string_of_typ xt ^ "in Map " ^ string_of_expr map))
