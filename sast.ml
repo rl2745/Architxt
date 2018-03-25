@@ -65,11 +65,11 @@ let rec string_of_sexpr (t, e) =
   | SArrayInit(typ, len) -> string_of_typ typ ^ "[" ^ string_of_sexpr len ^ "]"
   | SArrayDelete(s) -> "delete " ^ s
   | SMapInit(e1, e2) -> "Map" ^ "[" ^ string_of_sexpr e1 ^ "," ^ string_of_sexpr e2 ^ "]"       
-        (* add string, point, arrayaccess, assign, init, delete, mapinit*)     
+        (* add string, point, arrayaccess, assign, init, delete, mapinit*)  
+  | SPointAssign(id, t, e) -> id ^ "." ^ string_of_ptyp t ^ "=" ^ string_of_sexpr e
+  | SPointAccess(id, t) -> id ^ "." ^ string_of_ptyp t   
   | SNoexpr -> ""
 				  ) ^ ")"
-  | SPointAssign(id, t, e) -> id ^ "." ^ string_of_ptyp t ^ "=" ^ string_of_sexpr e
-  | SPointAccess(id, t) -> id ^ "." ^ string_of_ptyp t
   
 let rec string_of_sstmt = function
     SBlock(stmts) ->

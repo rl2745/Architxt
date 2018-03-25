@@ -1,8 +1,7 @@
 #Hello World to Test Code Gen
 
 int main() {
-	String helloWorld = "Hello World!";
-	printf(helloWorld);
+	print("hello world");
 	return 0;
 }
  
