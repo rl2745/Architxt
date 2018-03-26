@@ -30,7 +30,7 @@ let translate (_, functions) =
   and i32_t      = L.i32_type    context
   and i8_t       = L.i8_type     context 
   and void_t     = L.void_type   context in
-  let str_t  = L.pointer_type (L.i8_type context) in
+  let str_t  = L.pointer_type i8_t in
   (* Create an LLVM module -- this is a "container" into which we'll 
      generate actual code *)
   
@@ -45,7 +45,7 @@ let translate (_, functions) =
 
   (* Declare a "printf" function to implement MicroC's "print". *)
   let printf_t : L.lltype = 
-      L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
+      L.var_arg_function_type i32_t [| str_t |] in
   let printf_func : L.llvalue = 
      L.declare_function "printf" printf_t the_module in 
 
