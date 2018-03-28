@@ -1,7 +1,9 @@
 #Hello World to Test Code Gen
 
 int main() {
-	print("hello world");
+	string s;
+	s = "hello world";
+	print(s);
 	return 0;
 }
  

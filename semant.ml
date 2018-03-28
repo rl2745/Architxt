@@ -202,10 +202,6 @@ let check (globals, functions) =
         else (*parser already checks if it's surface or name*)
         (Point, SPointAccess(s, p))
 
-
-
-
-
     in
 
     let check_bool_expr e = 
