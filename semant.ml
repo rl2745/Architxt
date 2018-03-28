@@ -147,39 +147,38 @@ let check (globals, functions) =
             raise (Failure ( "expecting string but received " ^ string_of_typ t2 ^ "in Point " ^ string_of_expr e))
           else
             (Point, SPointLit((t1, e1'), (t2, e2')))
-      (*| ArrayAccess(s, e) as access -> 
-          let nametype = type_of_identifier s and (indxtyp, indx) = expr e in
+      | ArrayAccess(s, e) as access -> 
+          let nametype = type_of_identifier s and (indxtyp, _) = expr e in
           if (indxtyp != Int) then
             raise (Failure ("expecting int but received " ^ string_of_typ indxtyp ^ "in Array " ^ string_of_expr access))
           else
           if (nametype != ArrayType(Point)) then
             raise (Failure ("expecting array but received " ^ string_of_typ nametype ^ "in Array " ^ string_of_expr access))
           else 
-            (ArrayType(Point), SArrayAccess(expr s, expr e))
+            (Point, SArrayAccess(s, expr e))
       | ArrayAssign(s, index, e) as assign -> let nametype = type_of_identifier s 
-          and (itype, sitype) = expr index and (etyp, setyp) = expr e in
+          and (itype, _) = expr index and (etyp, _) = expr e in
           if (itype != Int) then 
             raise (Failure ("expecting int but received " ^ string_of_typ itype ^ " in Array " ^ string_of_expr assign))
           else
           if (nametype != ArrayType(Point)) then
             raise (Failure ("expecting array but received " ^ string_of_typ nametype ^ " in Array " ^ string_of_expr assign))
-          else let err = "expecting " ^ string_of_typ s ^
+          else let err = "expecting " ^ s ^
               " but indexing " ^ string_of_typ etyp ^ " in Array " ^ string_of_expr assign 
-              in (check_assign nametype etyp err, SArrayAssign(expr s, expr index, expr e))
-      | ArrayInit(typ, len) as init -> let nametype = type_of_identifier typ 
-          and (itype, stype) = expr len in
+              in (check_assign nametype etyp err, SArrayAssign(s, expr index, expr e))
+      | ArrayInit(typ, len) as init ->let (itype, _) = expr len in
           if (itype != Int) then
             raise (Failure ("expecting int but received" ^ string_of_typ itype ^ " in Array " ^ string_of_expr init))
           else
-          if (nametype != ArrayType(Point)) then
-            raise (Failure ("expecting array but received " ^ string_of_typ nametype ^ " in Array " ^ string_of_expr init))
+          if (typ != ArrayType(Point)) then
+            raise (Failure ("expecting array but received " ^ string_of_typ typ ^ " in Array " ^ string_of_expr init))
           else
-            (ArrayInit(Point), SArrayInit(expr typ, expr len))
+            (Point, SArrayInit(typ, expr len))
       | ArrayDelete(s) as del -> let nametype = type_of_identifier s in
-          if (nameType != ArrayType(Point)) then
-            raise (Failure ("expecting array but received " ^ string_of_typ nameType ^ " in Array " ^ string_of_expr del))
+          if (nametype != ArrayType(Point)) then
+            raise (Failure ("expecting array but received " ^ string_of_typ nametype ^ " in Array " ^ string_of_expr del))
           else
-            (ArrayDelete(Point), SArrayDelete(expr s))*)
+            (Point, SArrayDelete(s))
       | MapInit(x, y) as map -> let (xt, xs) = expr x and (yt, ys) = expr y in
           if (xt != Int) then
             raise (Failure ( "expecting int but received " ^ string_of_typ xt ^ "in Map " ^ string_of_expr map))
@@ -202,7 +201,6 @@ let check (globals, functions) =
           raise (Failure ( string_of_typ nametype ^ "is not a Point"))
         else (*parser already checks if it's surface or name*)
         (Point, SPointAccess(s, p))
-      | _ -> raise (Failure ("Not yet implemented:"))
 
 
 
