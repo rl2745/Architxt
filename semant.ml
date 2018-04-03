@@ -148,37 +148,54 @@ let check (globals, functions) =
           else
             (Point, SPointLit((t1, e1'), (t2, e2')))
       | ArrayAccess(s, e) as access -> 
-          let nametype = type_of_identifier s and (indxtyp, _) = expr e in
+          let nametype = type_of_identifier s and (indxtyp, _) = expr e 
+          and check_arr arr s = match arr with
+              ArrayType(t) -> t
+            | _ -> raise (Failure("expecting Array but received " ^ s ^ " which is not an array and cannot be accessed"))
+          in
           if (indxtyp != Int) then
             raise (Failure ("expecting int but received " ^ string_of_typ indxtyp ^ "in Array " ^ string_of_expr access))
-          else
+          (*else
           if (nametype != ArrayType(Point)) then
-            raise (Failure ("expecting array but received " ^ string_of_typ nametype ^ "in Array " ^ string_of_expr access))
+            raise (Failure ("expecting array but received " ^ string_of_typ nametype ^ "in Array " ^ string_of_expr access))*)
           else 
-            (Point, SArrayAccess(s, expr e))
+            (check_arr nametype s, SArrayAccess(s, expr e))
       | ArrayAssign(s, index, e) as assign -> let nametype = type_of_identifier s 
-          and (itype, _) = expr index and (etyp, _) = expr e in
+          and (itype, _) = expr index and (etyp, _) = expr e 
+          and check_arr arr s = match arr with
+              ArrayType(t) -> t
+            | _ -> raise (Failure("expecting Array but received " ^ s ^ " which is not an array and cannot have something assigned" ))
+          in
           if (itype != Int) then 
             raise (Failure ("expecting int but received " ^ string_of_typ itype ^ " in Array " ^ string_of_expr assign))
-          else
+          (*else
           if (nametype != ArrayType(Point)) then
             raise (Failure ("expecting array but received " ^ string_of_typ nametype ^ " in Array " ^ string_of_expr assign))
+          add in the check so that people cannot assign to arrays something not of its type*)
           else let err = "expecting " ^ s ^
               " but indexing " ^ string_of_typ etyp ^ " in Array " ^ string_of_expr assign 
-              in (check_assign nametype etyp err, SArrayAssign(s, expr index, expr e))
-      | ArrayInit(typ, len) as init ->let (itype, _) = expr len in
+              in (check_assign (check_arr nametype s) etyp err, SArrayAssign(s, expr index, expr e))
+      | ArrayInit(typ, len) as init ->let (itype, _) = expr len 
+          in
           if (itype != Int) then
             raise (Failure ("expecting int but received" ^ string_of_typ itype ^ " in Array " ^ string_of_expr init))
-          else
+          (*else
           if (typ != ArrayType(Point)) then
-            raise (Failure ("expecting array but received " ^ string_of_typ typ ^ " in Array " ^ string_of_expr init))
+            raise (Failure ("expecting array but received " ^ string_of_typ typ ^ " in Array " ^ string_of_expr init))*)
           else
-            (Point, SArrayInit(typ, expr len))
-      | ArrayDelete(s) as del -> let nametype = type_of_identifier s in
-          if (nametype != ArrayType(Point)) then
+          if (typ == Void) then
+            raise (Failure ("no void arrays allowed"))
+          else
+            (typ, SArrayInit(typ, expr len))
+      | ArrayDelete(s) -> let nametype = type_of_identifier s 
+          and check_arr arr s = match arr with
+              ArrayType(t) -> t
+            | _ -> raise (Failure("expecting Array but received " ^ s ^ " which is not an array and cannot be deleted this way"))
+          in
+          (*if (nametype != ArrayType(Point)) then
             raise (Failure ("expecting array but received " ^ string_of_typ nametype ^ " in Array " ^ string_of_expr del))
-          else
-            (Point, SArrayDelete(s))
+          else*)
+            (check_arr nametype s, SArrayDelete(s))
       | MapInit(x, y) as map -> let (xt, xs) = expr x and (yt, ys) = expr y in
           if (xt != Int) then
             raise (Failure ( "expecting int but received " ^ string_of_typ xt ^ "in Map " ^ string_of_expr map))
