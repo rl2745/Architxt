@@ -32,15 +32,15 @@ let check (globals, functions) =
   print (for string and int), fill, propagate, display*)
   let built_in_decls = 
      StringMap.add "print" { typ = Void; fname = "print"; formals = [(String, "x")];
-      locals = []; body = [] } StringMap.empty
-    (*( StringMap.add "print_i" { typ = Void; fname = "print_i"; formals = [(Int, "x")];
-      locals = []; body = [] }) *) (* temp removal to just make sure string works
+      locals = []; body = [] } 
+    ( StringMap.add "print_i" { typ = Void; fname = "print_i"; formals = [(Int, "x")];
+      locals = []; body = [] }  (* temp removal to just make sure string works*)
     ( StringMap.add "fill" { typ = Void; fname = "fill"; formals = [(Int, "x"); (Int, "y"); (Point, "p")];
       locals = []; body = [] }
     ( StringMap.add "propagate" { typ = Void; fname = "propagate"; formals = [(Point, "p")];
       locals = []; body = [] }
-    ( StringMap.add "display" { typ = Void; fname = "display"; formals = [(Map, "m")];
-      locals = []; body = [] }))))*)
+    ( StringMap.singleton "display" { typ = Void; fname = "display"; formals = [(Map, "m")];
+      locals = []; body = [] }))))
   in
 
   (*add_func checks to make sure things aren't built in and things aren't duplicated*)
