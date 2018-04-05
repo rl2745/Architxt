@@ -31,6 +31,8 @@ type expr =
   | MapInit of expr * expr
   | PointAssign of string * ptyp * expr
   | PointAccess of string * ptyp
+  | MapAccess of string * expr * expr
+  | MapAssign of string * expr * expr * expr
   (* added String, point; need to add map, assign map, assign point, access...*)
 
 type stmt =
@@ -112,6 +114,8 @@ let rec string_of_expr = function
   | MapInit(e1, e2) -> "Map" ^ "[" ^ string_of_expr e1 ^ "," ^ string_of_expr e2 ^ "]"
   | PointAssign(id, t, e) -> id ^ "." ^ string_of_ptyp t ^ "=" ^ string_of_expr e
   | PointAccess(id, t) -> id ^ "." ^ string_of_ptyp t
+  | MapAccess(id, e1, e2) -> id ^ "[" ^ string_of_expr e1 ^ "]" ^ "[" ^ string_of_expr e2 ^ "]"
+  | MapAssign(id, e1, e2, e3) -> id ^ "[" ^ string_of_expr e1 ^ "]" ^ "[" ^ string_of_expr e2 ^ "] =" ^ string_of_expr e3
   (* could change how its represented, just used this for now*)
   (*added String and point; need to add map*)
 

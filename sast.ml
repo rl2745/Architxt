@@ -22,6 +22,8 @@ and sx =
   | SMapInit of sexpr * sexpr
   | SPointAssign of string * ptyp * sexpr
   | SPointAccess of string * ptyp
+  | SMapAccess of string * sexpr * sexpr
+  | SMapAssign of string * sexpr * sexpr * sexpr
   (*add String, Point, ArrayInit, Delete, Access, Assign, MapInit*)
 
 type sstmt =
@@ -67,7 +69,9 @@ let rec string_of_sexpr (t, e) =
   | SMapInit(e1, e2) -> "Map" ^ "[" ^ string_of_sexpr e1 ^ "," ^ string_of_sexpr e2 ^ "]"       
         (* add string, point, arrayaccess, assign, init, delete, mapinit*)  
   | SPointAssign(id, t, e) -> id ^ "." ^ string_of_ptyp t ^ "=" ^ string_of_sexpr e
-  | SPointAccess(id, t) -> id ^ "." ^ string_of_ptyp t   
+  | SPointAccess(id, t) -> id ^ "." ^ string_of_ptyp t  
+  | SMapAccess(id, e1, e2) -> id ^ "[" ^ string_of_sexpr e1 ^ "]" ^ "[" ^ string_of_sexpr e2 ^ "]"
+  | SMapAssign(id, e1, e2, e3) -> id ^ "[" ^ string_of_sexpr e1 ^ "]" ^ "[" ^ string_of_sexpr e2 ^ "] =" ^ string_of_sexpr e3 
   | SNoexpr -> ""
 				  ) ^ ")"
   

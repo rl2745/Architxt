@@ -127,6 +127,8 @@ expr:
   | ID PERIOD SURFACE                        { PointAccess($1, Surface)}
   | ID PERIOD NAME ASSIGN expr               { PointAssign($1, Name, $5)}
   | ID PERIOD NAME                           { PointAccess($1, Name)}
+  | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET     { MapAccess($1, $3, $6)}
+  | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET ASSIGN expr    { MapAssign($1, $3, $6, $9)}
   /*added string and point, need to add map*/
 
 args_opt:

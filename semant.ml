@@ -141,10 +141,10 @@ let check (globals, functions) =
           let (t1, e1') = expr e1
           and (t2, e2') = expr e2 in
           if (t1 != Bool) then
-            raise (Failure ("expecting bool but received " ^ string_of_typ t1 ^ "in Point " ^ string_of_expr e))
+            raise (Failure ("expecting bool but received " ^ string_of_typ t1 ^ " in Point " ^ string_of_expr e))
           else 
           if (t2 != String) then
-            raise (Failure ( "expecting string but received " ^ string_of_typ t2 ^ "in Point " ^ string_of_expr e))
+            raise (Failure ( "expecting string but received " ^ string_of_typ t2 ^ " in Point " ^ string_of_expr e))
           else
             (Point, SPointLit((t1, e1'), (t2, e2')))
       | ArrayAccess(s, e) as access -> 
@@ -198,27 +198,51 @@ let check (globals, functions) =
             (check_arr nametype s, SArrayDelete(s))
       | MapInit(x, y) as map -> let (xt, xs) = expr x and (yt, ys) = expr y in
           if (xt != Int) then
-            raise (Failure ( "expecting int but received " ^ string_of_typ xt ^ "in Map " ^ string_of_expr map))
+            raise (Failure ( "expecting int but received " ^ string_of_typ xt ^ " in Map " ^ string_of_expr map))
           else
           if (yt != Int) then
-            raise (Failure ( "expecting int but received " ^ string_of_typ yt ^ "in Map " ^ string_of_expr map))
+            raise (Failure ( "expecting int but received " ^ string_of_typ yt ^ " in Map " ^ string_of_expr map))
           else (Map, SMapInit((xt, xs), (yt, ys)))
       | PointAssign(s, p, e) as point -> let nametype = type_of_identifier s and (etype, setype) = expr e in
         if (nametype != Point) then
           raise (Failure ( string_of_typ nametype ^ "is not a Point"))
         else
         if ((p == Surface) && (etype != Bool)) then 
-          raise (Failure ( "expecting bool but received " ^ string_of_typ etype ^ "in Point " ^ string_of_expr point))
+          raise (Failure ( "expecting bool but received " ^ string_of_typ etype ^ " in Point " ^ string_of_expr point))
         else
         if ((p == Name) && (etype != String)) then
-          raise (Failure ( "expecting string but received " ^ string_of_typ etype ^ "in Point " ^ string_of_expr point))
+          raise (Failure ( "expecting string but received " ^ string_of_typ etype ^ " in Point " ^ string_of_expr point))
         else (Point, SPointAssign(s, p, (etype, setype)))
       | PointAccess(s, p) -> let nametype = type_of_identifier s in
         if (nametype != Point) then
-          raise (Failure ( string_of_typ nametype ^ "is not a Point"))
+          raise (Failure ( string_of_typ nametype ^ " is not a Point"))
         else (*parser already checks if it's surface or name*)
         (Point, SPointAccess(s, p))
-
+      | MapAccess(s, x, y) as map -> let nametype = type_of_identifier s 
+        and (xt, xs) = expr x and (yt, ys) = expr y in
+        if (nametype != Map) then
+          raise (Failure (string_of_typ nametype ^ " is not a Map!"))
+        else
+        if (xt != Int) then
+          raise (Failure ( "expecting int but received " ^ string_of_typ xt ^ " in Map " ^ string_of_expr map))
+        else
+        if (yt != Int) then
+            raise (Failure ( "expecting int but received " ^ string_of_typ yt ^ " in Map " ^ string_of_expr map))
+        else (Map, SMapAccess(s, (xt, xs), (yt, ys)))
+      | MapAssign(s, x, y, e) as map -> let nametype = type_of_identifier s 
+        and (xt, xs) = expr x and (yt, ys) = expr y and (et, es) = expr e in
+        if (nametype != Map) then
+          raise (Failure (string_of_typ nametype ^ " is not a Map!"))
+        else
+        if (xt != Int) then
+          raise (Failure ( "expecting int but received " ^ string_of_typ xt ^ " in Map " ^ string_of_expr map))
+        else
+        if (yt != Int) then
+            raise (Failure ( "expecting int but received " ^ string_of_typ yt ^ " in Map " ^ string_of_expr map))
+        else
+        if (et != Point) then
+          raise (Failure (string_of_typ et ^ " is not a Point and cannot be assigned to the Map."))
+        else (Map, SMapAssign(s, (xt, xs), (yt, ys), (et, es)))
     in
 
     let check_bool_expr e = 
