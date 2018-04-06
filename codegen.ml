@@ -33,10 +33,9 @@ let translate (globals, functions) =
   and float_t    = L.double_type context
   and void_t     = L.void_type   context in
   let str_t  = L.pointer_type i8_t in
+
   (* Create an LLVM module -- this is a "container" into which we'll 
      generate actual code *)
-  
-
   (* Convert Architxt types to LLVM types *)
   let ltype_of_typ = function
       A.Int   -> i32_t
@@ -44,6 +43,7 @@ let translate (globals, functions) =
     | A.Bool  -> i1_t
     | A.Float -> float_t
     | A.String -> str_t
+    | A.Point -> i32_t
     | t -> raise (Failure ("Type " ^ A.string_of_typ t ^ " not implemented yet"))
   in
 
@@ -124,51 +124,67 @@ let translate (globals, functions) =
             let _  = L.build_store e' (lookup s) builder in e'
       | SStringLit s -> L.build_global_stringptr(s) "str" builder
       | SBinop (e1, op, e2) ->
-    let (t, _) = e1
-    and e1' = expr builder e1
-    and e2' = expr builder e2 in
-    if t = A.Float then (match op with 
-      A.Add     -> L.build_fadd
-    | A.Sub     -> L.build_fsub
-    | A.Mult    -> L.build_fmul
-    | A.Div     -> L.build_fdiv 
-    | A.Equal   -> L.build_fcmp L.Fcmp.Oeq
-    | A.Neq     -> L.build_fcmp L.Fcmp.One
-    | A.Less    -> L.build_fcmp L.Fcmp.Olt
-    | A.Leq     -> L.build_fcmp L.Fcmp.Ole
-    | A.Greater -> L.build_fcmp L.Fcmp.Ogt
-    | A.Geq     -> L.build_fcmp L.Fcmp.Oge
-    | A.And | A.Or ->
-        raise (Failure "internal error: semant should have rejected and/or on float")
-    ) e1' e2' "tmp" builder 
-    else (match op with
-    | A.Add     -> L.build_add
-    | A.Sub     -> L.build_sub
-    | A.Mult    -> L.build_mul
-          | A.Div     -> L.build_sdiv
-    | A.And     -> L.build_and
-    | A.Or      -> L.build_or
-    | A.Equal   -> L.build_icmp L.Icmp.Eq
-    | A.Neq     -> L.build_icmp L.Icmp.Ne
-    | A.Less    -> L.build_icmp L.Icmp.Slt
-    | A.Leq     -> L.build_icmp L.Icmp.Sle
-    | A.Greater -> L.build_icmp L.Icmp.Sgt
-    | A.Geq     -> L.build_icmp L.Icmp.Sge
-    ) e1' e2' "tmp" builder
+          let (t, _) = e1
+          and e1' = expr builder e1
+          and e2' = expr builder e2 in
+          if t = A.Float then (match op with 
+            A.Add     -> L.build_fadd
+          | A.Sub     -> L.build_fsub
+          | A.Mult    -> L.build_fmul
+          | A.Div     -> L.build_fdiv 
+          | A.Equal   -> L.build_fcmp L.Fcmp.Oeq
+          | A.Neq     -> L.build_fcmp L.Fcmp.One
+          | A.Less    -> L.build_fcmp L.Fcmp.Olt
+          | A.Leq     -> L.build_fcmp L.Fcmp.Ole
+          | A.Greater -> L.build_fcmp L.Fcmp.Ogt
+          | A.Geq     -> L.build_fcmp L.Fcmp.Oge
+          | A.And | A.Or ->
+              raise (Failure "internal error: semant should have rejected and/or on float")
+          ) e1' e2' "tmp" builder 
+          else (match op with
+          | A.Add     -> L.build_add
+          | A.Sub     -> L.build_sub
+          | A.Mult    -> L.build_mul
+                | A.Div     -> L.build_sdiv
+          | A.And     -> L.build_and
+          | A.Or      -> L.build_or
+          | A.Equal   -> L.build_icmp L.Icmp.Eq
+          | A.Neq     -> L.build_icmp L.Icmp.Ne
+          | A.Less    -> L.build_icmp L.Icmp.Slt
+          | A.Leq     -> L.build_icmp L.Icmp.Sle
+          | A.Greater -> L.build_icmp L.Icmp.Sgt
+          | A.Geq     -> L.build_icmp L.Icmp.Sge
+          ) e1' e2' "tmp" builder
       | SUnop(op, e) -> let (t, _) = e in
           let e' = expr builder e in (match op with
-      A.Neg when t = A.Float -> L.build_fneg 
-    | A.Neg                  -> L.build_neg
-          | A.Not                  -> L.build_not) e' "tmp" builder
+                A.Neg when t = A.Float -> L.build_fneg 
+              | A.Neg                  -> L.build_neg
+              | A.Not                  -> L.build_not) e' "tmp" builder
       | SCall ("print", [e]) ->
          L.build_call printf_func [| str_format_str ; (expr builder e) |]
              "printf" builder
       | SCall ("print_i", [e]) -> (* Generate a call instruction *)
 	       L.build_call printf_func [| int_format_str ; (expr builder e) |]
 	           "printf" builder 
+      | SPointLit(e1, e2) -> let point = L.function_type i32_t [|i1_t; str_t|] 
+          and e1' = expr builder e1
+          and e2' = expr builder e2 
+          in let point_create = L.declare_function "point_create" point the_module
+        in L.build_call point_create [|e1';e2'|] "newPoint" builder
+      (*| SPointAccess(s, p) -> let point = expr builder s in
+        (match p with
+          | "surface" -> let surface = L.function_type i1_t [|i1t|]
+            in let access_surface = L.declare_function "accessSurface" surface the_module
+            in L.build_call access_surface [|point|] "surfaceVal" builder
+          | "name" -> let name = L.function_type str_t [|str_t|]
+            in let access_name = L.declare_function "accessName" name the_module
+            in L.build_call access_name [|point|] "nameVal" builder) *)
       (* Throw an error for any other expressions *)
       | _ -> to_imp (string_of_sexpr (A.Int,e))  
     in
+
+
+
     (* Each basic block in a program ends with a "terminator" instruction i.e.
     one that ends the basic block. By definition, these instructions must
     indicate which basic block comes next -- they typically yield "void" value

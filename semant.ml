@@ -216,8 +216,9 @@ let check (globals, functions) =
       | PointAccess(s, p) -> let nametype = type_of_identifier s in
         if (nametype != Point) then
           raise (Failure ( string_of_typ nametype ^ " is not a Point"))
-        else (*parser already checks if it's surface or name*)
-        (Point, SPointAccess(s, p))
+        else let access_type = if (p = Surface) then Bool else String
+        in(*parser already checks if it's surface or name*)
+        (access_type, SPointAccess(s, p))
       | MapAccess(s, x, y) as map -> let nametype = type_of_identifier s 
         and (xt, xs) = expr x and (yt, ys) = expr y in
         if (nametype != Map) then
