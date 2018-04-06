@@ -166,11 +166,13 @@ let translate (globals, functions) =
       | SCall ("print_i", [e]) -> (* Generate a call instruction *)
 	       L.build_call printf_func [| int_format_str ; (expr builder e) |]
 	           "printf" builder 
-      | SPointLit(e1, e2) -> let point = L.function_type i32_t [|i1_t; str_t|] 
+      | SPointLit(e1, e2) -> let point = L.named_struct_type context "point" 
           and e1' = expr builder e1
           and e2' = expr builder e2 
-          in let point_create = L.declare_function "point_create" point the_module
-        in L.build_call point_create [|e1';e2'|] "newPoint" builder
+          in let _ = L.struct_set_body point [|i1_t; str_t|] true
+        in L.const_named_struct point [|e1'; e2'|]
+       (* in let ptr = L.build_gep point [| i1_t |] "surface_tmp" builder in L.build_store (e1) ptr builder;
+        let ptr = L.build_gep point [| str_t |] "surface_tmp" builder in L.build_store (e2) ptr builder *)
       (*| SPointAccess(s, p) -> let point = expr builder s in
         (match p with
           | "surface" -> let surface = L.function_type i1_t [|i1t|]
