@@ -182,6 +182,12 @@ let translate (globals, functions) =
               L.build_load p1 "surface" builder
           | A.Name -> let p2 = L.build_struct_gep name 1 "pointer2" builder in
               L.build_load p2 "name" builder)
+      | SPointAssign(s, p, e) -> let name = L.build_load (lookup s) s builder and e' = expr builder e 
+        in (match p with
+          A.Surface -> let p1 = L.build_struct_gep name 0 "pointer1" builder in
+              L.build_store e' p1 builder
+          | A.Name -> let p2 = L.build_struct_gep name 1 "pointer2" builder in
+              L.build_store e' p2 builder); name
       | _ -> to_imp (string_of_sexpr (A.Int,e))  
     in
 
