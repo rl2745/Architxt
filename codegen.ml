@@ -33,8 +33,9 @@ let translate (globals, functions) =
   and float_t    = L.double_type context
   and void_t     = L.void_type   context in
   let str_t      = L.pointer_type i8_t in
-  let point_t    = L.named_struct_type context "point_t" 
-    in let _ = L.struct_set_body point_t [|i1_t; str_t|] true in
+  let point_st    = L.named_struct_type context "point_t" 
+    in let _ = L.struct_set_body point_st [|i1_t; str_t|] true in
+    let point_t = L.pointer_type point_st in
 
   (* Create an LLVM module -- this is a "container" into which we'll 
      generate actual code *)
@@ -169,12 +170,12 @@ let translate (globals, functions) =
 	       L.build_call printf_func [| int_format_str ; (expr builder e) |]
 	           "printf" builder 
       | SPointLit(e1, e2) -> let e1' = expr builder e1 and e2' = expr builder e2 in
-        (*let point = L.build_alloca point_t "point" builder in
+        let point = L.build_alloca point_st "point" builder in
         let ptr1 = L.build_struct_gep point 0 "pointer1" builder in
         ignore(L.build_store e1' ptr1 builder);
         let ptr2 = L.build_struct_gep point 1 "pointer2" builder in
-        ignore(L.build_store e2' ptr2 builder); point*)
-        L.const_named_struct point_t [|e1'; e2'|]
+        ignore(L.build_store e2' ptr2 builder); point
+        (*L.const_named_struct point_t [|e1'; e2'|]*)
       | SPointAccess(s, p) -> let name = L.build_load (lookup s) s builder in
         (match p with
           A.Surface -> let p1 = L.build_struct_gep name 0 "pointer1" builder in
