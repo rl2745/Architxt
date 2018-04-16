@@ -120,8 +120,6 @@ expr:
   | DELETE ID                             { ArrayDelete($2) }
   | ID LBRACKET expr RBRACKET ASSIGN expr { ArrayAssign($1, $3, $6) }
   | ID LBRACKET expr RBRACKET             { ArrayAccess($1, $3) }
-  | expr PLUS PLUS                        { Unop(Incr, $1) }
-  | expr MINUS MINUS                      { Unop(Decr, $1) }
   | map_init { $1 }
   | ID PERIOD SURFACE ASSIGN expr            { PointAssign($1, Surface, $5)}
   | ID PERIOD SURFACE                        { PointAccess($1, Surface)}

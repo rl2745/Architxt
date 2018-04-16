@@ -160,9 +160,9 @@ let translate (globals, functions) =
           ) e1' e2' "tmp" builder
       | SUnop(op, e) -> let (t, _) = e in
           let e' = expr builder e in (match op with
-                A.Neg when t = A.Float -> L.build_fneg 
-              | A.Neg                  -> L.build_neg
-              | A.Not                  -> L.build_not) e' "tmp" builder
+                A.Neg when t = A.Float -> L.build_fneg e' "tmp" builder
+              | A.Neg                  -> L.build_neg e' "tmp" builder
+              | A.Not                  -> L.build_not e' "tmp" builder)
       | SCall ("print", [e]) ->
          L.build_call printf_func [| str_format_str ; (expr builder e) |]
              "printf" builder
@@ -184,10 +184,10 @@ let translate (globals, functions) =
               L.build_load p2 "name" builder)
       | SPointAssign(s, p, e) -> let name = L.build_load (lookup s) s builder and e' = expr builder e 
         in (match p with
-          A.Surface -> let p1 = L.build_struct_gep name 0 "pointer1" builder in
-              L.build_store e' p1 builder
+            A.Surface -> let p1 = L.build_struct_gep name 0 "pointer1" builder in
+              ignore(L.build_store e' p1 builder)
           | A.Name -> let p2 = L.build_struct_gep name 1 "pointer2" builder in
-              L.build_store e' p2 builder); name
+              ignore(L.build_store e' p2 builder)); name
       | _ -> to_imp (string_of_sexpr (A.Int,e))  
     in
 

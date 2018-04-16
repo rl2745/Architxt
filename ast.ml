@@ -6,7 +6,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
 (* point types = surface, name *)
 type ptyp = Surface | Name
 
-type uop = Neg | Not | Incr | Decr (*added increment and decrement*)
+type uop = Neg | Not 
 
 type typ = Int | Bool | Float | Void | String | Char | Point | Map | ArrayType of typ (*added String, char, point; need to add map*)
 
@@ -72,8 +72,6 @@ let string_of_op = function
 let string_of_uop = function
     Neg -> "-"
   | Not -> "!"
-  | Incr -> "++"
-  | Decr -> "--" (*added increment and decrement*)
 
 let rec string_of_typ = function
     Int -> "int"

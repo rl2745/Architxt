@@ -94,7 +94,7 @@ Check() {
     generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&
     Run "$ARCHITXT" "$1" ">" "${basename}.ll" &&
     Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
-    Run "$CC" "-o" "${basename}.exe" "${basename}.s" "printbig.o" &&
+    Run "$CC" "-o" "${basename}.exe" "${basename}.s" &&
     Run "./${basename}.exe" > "${basename}.out" &&
     Compare ${basename}.out ${reffile}.out ${basename}.diff
 
@@ -167,12 +167,12 @@ which "$LLI" >> $globallog || LLIFail
 
 #Include the hello world file here
 
-if [ ! -f helloworld.o ]
-then
-    echo "Could not find helloworld.o"
-    echo "Try \"make helloworld.o\""
-    exit 1
-fi
+#if [ ! -f helloworld.o ]
+#then
+#    echo "Could not find helloworld.o"
+#    echo "Try \"make helloworld.o\""
+#    exit 1
+#fi
 
 if [ $# -ge 1 ]
 then
