@@ -198,4 +198,3 @@ do
 done
 
 exit $globalerror
-

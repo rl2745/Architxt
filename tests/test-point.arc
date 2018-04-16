@@ -1,5 +1,5 @@
-int sqrt(int x) {
+int main() {
 	point p;
 	p = (true, "c");
-	return x;
+	return 0;
 }

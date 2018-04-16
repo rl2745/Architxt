@@ -1,9 +1,13 @@
 #/Created by Richard Lopez - this is a positive test for determining if a number is a positive or negative number
 
-int posOrNeg(int x){
+bool main(){
+	int x;
+	bool b;
+	x = 5;
 	if (x > 0)
-		return "positive";
+		b = true;
 	else
-		return "negative";
+		b = false;
+	return b;
 }
 
