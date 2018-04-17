@@ -1,13 +1,11 @@
-#/Created by Richard Lopez - this is a positive test for determining if a number is a positive or negative number
-
-bool main(){
+int main(){
 	int x;
 	bool b;
 	x = 5;
 	if (x > 0)
-		b = true;
+		print_i(1);
 	else
-		b = false;
-	return b;
+		print_i(0);
+	return 0;
 }
 
