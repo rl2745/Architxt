@@ -13,12 +13,14 @@ This has been tested on and works on LLVM 3.8
 
 Points have been added, though array and maps need to be added. It should not throw any warnings when using $make command.
 
-test-array
-test-bool
-test-float
+test-array - tests array assignment, intialization, and setting an array index 
+  to a value
+test-bool = tests initialization and assignment of a boolean
+test-float = tests initialization and assignment of a float
 test-hello = tests if it can print out hello world
-test-ifelse
-test-intdiv
+test-ifelse = tests if-else statements in Architxt by testing if an int is 
+  greater than 0
+test-intdiv = tests whether an initialized integer value can be divided
 test-point2 = tests assignment of point using variables instead of literals
 test-pointaccess2 = tests access of a point's surface
 test-pointaccess = tests access of a point's name
@@ -28,14 +30,18 @@ test-pointassign3 = tests assignment of point values after creation with IDs
 test-pointassign = tests assignment of a point's name after creation
 test-printi = tests the print_i feature which prints integers
 test-string = tests creating and assigning a string
-fail-comma
-fail-map
-fail-paren
+fail-comma = tests invalid ending of a statement with a comma rather than a 
+  semicolon
+fail-map = tests incorrect declaration of a map using a ) instead of a ] 
+fail-paren = tests incorrect use of brackets instead of parenthesis to enclose 
+  the right side of an assignment
 fail-pointaccess2 = tests invalid assignment of string to int in point access
 fail-pointaccess = tests attempting to print out boolean and bad keyword Surface
 fail-pointassign2 = tests that it rejects assignment of non-strings to name
 fail-pointassign = tests bad keyword Name
 fail-pointtyp = tests that it rejects invalid types when creating points
-fail-return_statement
-fail-stringconcat
-fail-stringint
+fail-return_statement = tests incorrect return statement not ended with a ";"
+fail-stringconcat = tries to concatenate a string, which is not allowed in 
+  Architxt
+fail-stringint = tests whether strings can be treated as ints by adding a 
+  string variable to an integer
