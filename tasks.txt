@@ -1,0 +1,9 @@
+Built in functions: 
+	propagate
+	fill
+	display
+Print functions:
+	floats
+Finish out semant (if time)
+Arrays in codegen
+maps in codegen (& semant)
