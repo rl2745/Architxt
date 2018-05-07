@@ -31,6 +31,7 @@ let translate (globals, functions) =
   and i8_t       = L.i8_type     context 
   and i1_t       = L.i1_type     context
   and float_t    = L.double_type context
+
   and void_t     = L.void_type   context in
   let str_t      = L.pointer_type i8_t in
   let point_st    = L.named_struct_type context "point_t" 
@@ -47,6 +48,7 @@ let translate (globals, functions) =
     | A.Float -> float_t
     | A.String -> str_t
     | A.Point -> point_t
+    | A.ArrayType(t) -> L.pointer_type (ltype_of_typ t)
     | t -> raise (Failure ("Type " ^ A.string_of_typ t ^ " not implemented yet"))
   in
 
@@ -54,7 +56,8 @@ let translate (globals, functions) =
   let global_vars : L.llvalue StringMap.t =
     let global_var m (t, n) = 
       let init = match t with
-          A.Float -> L.const_float (ltype_of_typ t) 0.0
+          A.ArrayType(_) -> L.const_pointer_null (ltype_of_typ t)
+          | A.Float -> L.const_float (ltype_of_typ t) 0.0
         | _ -> L.const_int (ltype_of_typ t) 0
       in StringMap.add n (L.define_global n init the_module) m in
     List.fold_left global_var StringMap.empty globals in
@@ -115,10 +118,28 @@ let translate (globals, functions) =
     let lookup n = try StringMap.find n local_vars
                    with Not_found -> StringMap.find n global_vars
     in
+
+    let get_array_element name i builder =
+      let arr = L. (lookup name) "" builder in
+      let ptr = L.build_gep arr [|i|] "" builder in
+      L.build_load ptr "" builder
+
+    in
+
+    let set_array_element  name i v builder =
+      let arr = L.build_load (lookup name) "" builder in
+      let ptr = L.build_gep arr [|i|] "" builder in
+      L.build_store v ptr builder
+
+    in
+
+    let init_array typ len builder = 
+      L.build_array_malloc (ltype_of_typ) len "" builder
+    in
     
     (* Generate LLVM code for a call to MicroC's "print" *)
     let rec expr builder ((_, e) : sexpr) = match e with
-	      SLiteral i -> L.const_int i32_t i (* Generate a constant integer *)
+        SLiteral i -> L.const_int i32_t i (* Generate a constant integer *)
       | SBoolLit b -> L.const_int i1_t (if b then 1 else 0)
       | SFliteral l -> L.const_float_of_string float_t l
       | SNoexpr -> L.const_int i32_t 0
@@ -126,6 +147,10 @@ let translate (globals, functions) =
       | SAssign (s, e) -> let e' = expr builder e in
             let _  = L.build_store e' (lookup s) builder in e'
       | SStringLit s -> L.build_global_stringptr(s) "str" builder
+      | SArrayAccess(s, e) -> get_array_element s (expr builder e) builder
+      | SArrayInit(typ, e) -> let len = (expr builder e) in init_array typ len builder
+      | SArrayDelete(s) -> L.build_free (L.build_load (lookup s) "" builder) builder
+      | SArrayAssign(s, lhs, rhs) -> set_array_element s (expr builder lhs) (expr builder rhs) builder
       | SBinop (e1, op, e2) ->
           let (t, _) = e1
           and e1' = expr builder e1
@@ -148,7 +173,7 @@ let translate (globals, functions) =
           | A.Add     -> L.build_add
           | A.Sub     -> L.build_sub
           | A.Mult    -> L.build_mul
-                | A.Div     -> L.build_sdiv
+          | A.Div     -> L.build_sdiv
           | A.And     -> L.build_and
           | A.Or      -> L.build_or
           | A.Equal   -> L.build_icmp L.Icmp.Eq
@@ -167,8 +192,8 @@ let translate (globals, functions) =
          L.build_call printf_func [| str_format_str ; (expr builder e) |]
              "printf" builder
       | SCall ("print_i", [e]) -> (* Generate a call instruction *)
-	       L.build_call printf_func [| int_format_str ; (expr builder e) |]
-	           "printf" builder 
+         L.build_call printf_func [| int_format_str ; (expr builder e) |]
+             "printf" builder 
       | SPointLit(e1, e2) -> let e1' = expr builder e1 and e2' = expr builder e2 in
         let point = L.build_alloca point_st "point" builder in
         let ptr1 = L.build_struct_gep point 0 "pointer1" builder in

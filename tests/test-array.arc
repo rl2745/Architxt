@@ -1,5 +1,7 @@
-int sqrt(int x) {
-	p = new int[x];
-	p[0] = x;
-	return p[0];
+int main() {
+    p = new int[2];
+    p[0] = 3;
+    print_i(p[0]);
+    return 0;
 }
+
