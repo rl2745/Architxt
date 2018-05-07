@@ -63,7 +63,7 @@ let translate (globals, functions) =
       in StringMap.add n (L.define_global n init the_module) m in
     List.fold_left global_var StringMap.empty globals in
 
-  (* Declare a "printf" function to implement MicroC's "print". *)
+  (* Declare a "printf" function to implement Architxt's "print". *)
   let printf_t : L.lltype = 
       L.var_arg_function_type i32_t [| str_t |] in
   let printf_func : L.llvalue = 
@@ -89,7 +89,7 @@ let translate (globals, functions) =
 
     let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder
     and str_format_str = L.build_global_stringptr "%s\n" "fmt" builder
-    (*and float_format_str = L.build_global_stringptr "%g\n" "fmt" builder*) in
+    and float_format_str = L.build_global_stringptr "%g\n" "fmt" builder in
 
     (* Construct the function's "locals": formal arguments and locally
        declared variables.  Allocate each on the stack, initialize their
@@ -138,7 +138,7 @@ let translate (globals, functions) =
       L.build_array_malloc (ltype_of_typ typ) len "" builder
     in
     
-    (* Generate LLVM code for a call to MicroC's "print" *)
+    (* Generate LLVM code for a call to Architxt's "print" *)
     let rec expr builder ((_, e) : sexpr) = match e with
         SLiteral i -> L.const_int i32_t i (* Generate a constant integer *)
       | SBoolLit b -> L.const_int i1_t (if b then 1 else 0)
@@ -194,6 +194,9 @@ let translate (globals, functions) =
              "printf" builder
       | SCall ("print_i", [e]) -> (* Generate a call instruction *)
          L.build_call printf_func [| int_format_str ; (expr builder e) |]
+             "printf" builder 
+      | SCall ("print_f", [e]) -> (* Generate a call instruction *)
+         L.build_call printf_func [| float_format_str ; (expr builder e) |]
              "printf" builder 
       | SCall (f, act) ->
           let (fdef, fdecl) = StringMap.find f function_decls in

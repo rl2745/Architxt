@@ -8,7 +8,7 @@ This has been tested on and works on LLVM 3.8
 Compliation Instructions:
     - run $make and this creates toplevel.native
     - to execute a program, run ./toplevel.native____.arc where ____ is an .arc file. this will produce an llvm output
-    - to teset the program, run ./testall.sh
+    - to test the program, run ./testall.sh
         this should output the testname and OK or FAILED with a message (depending upon the results). It will also produce a testall.log with commands that it executed and where exactly it failed.
 
 TO-DO:
