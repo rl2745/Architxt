@@ -31,9 +31,10 @@ let translate (globals, functions) =
   and i8_t       = L.i8_type     context 
   and i1_t       = L.i1_type     context
   and float_t    = L.double_type context
-
   and void_t     = L.void_type   context in
+  let pointer_t = L.pointer_type in
   let str_t      = L.pointer_type i8_t in
+
   let point_st    = L.named_struct_type context "point_t" 
     in let _ = L.struct_set_body point_st [|i1_t; str_t|] true in
     let point_t = L.pointer_type point_st in
@@ -41,14 +42,14 @@ let translate (globals, functions) =
   (* Create an LLVM module -- this is a "container" into which we'll 
      generate actual code *)
   (* Convert Architxt types to LLVM types *)
-  let ltype_of_typ = function
+  let rec ltype_of_typ = function
       A.Int   -> i32_t
     | A.Void  -> void_t
     | A.Bool  -> i1_t
     | A.Float -> float_t
     | A.String -> str_t
     | A.Point -> point_t
-    | A.ArrayType(t) -> L.pointer_type (ltype_of_typ t)
+    | A.ArrayType(t) -> pointer_t (ltype_of_typ t)
     | t -> raise (Failure ("Type " ^ A.string_of_typ t ^ " not implemented yet"))
   in
 
@@ -57,7 +58,7 @@ let translate (globals, functions) =
     let global_var m (t, n) = 
       let init = match t with
           A.ArrayType(_) -> L.const_pointer_null (ltype_of_typ t)
-          | A.Float -> L.const_float (ltype_of_typ t) 0.0
+        | A.Float -> L.const_float (ltype_of_typ t) 0.0
         | _ -> L.const_int (ltype_of_typ t) 0
       in StringMap.add n (L.define_global n init the_module) m in
     List.fold_left global_var StringMap.empty globals in
@@ -120,7 +121,7 @@ let translate (globals, functions) =
     in
 
     let get_array_element name i builder =
-      let arr = L. (lookup name) "" builder in
+      let arr = L.build_load (lookup name) "" builder in
       let ptr = L.build_gep arr [|i|] "" builder in
       L.build_load ptr "" builder
 
@@ -134,7 +135,7 @@ let translate (globals, functions) =
     in
 
     let init_array typ len builder = 
-      L.build_array_malloc (ltype_of_typ) len "" builder
+      L.build_array_malloc (ltype_of_typ typ) len "" builder
     in
     
     (* Generate LLVM code for a call to MicroC's "print" *)
@@ -194,6 +195,12 @@ let translate (globals, functions) =
       | SCall ("print_i", [e]) -> (* Generate a call instruction *)
          L.build_call printf_func [| int_format_str ; (expr builder e) |]
              "printf" builder 
+      | SCall (f, act) ->
+          let (fdef, fdecl) = StringMap.find f function_decls in
+          let actuals = List.rev (List.map (expr builder) (List.rev act)) in
+          let result = (match fdecl.styp with A.Void -> ""
+        | _ -> f ^ "_result") in
+          L.build_call fdef (Array.of_list actuals) result builder
       | SPointLit(e1, e2) -> let e1' = expr builder e1 and e2' = expr builder e2 in
         let point = L.build_alloca point_st "point" builder in
         let ptr1 = L.build_struct_gep point 0 "pointer1" builder in
