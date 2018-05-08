@@ -54,5 +54,5 @@ Language:
 2) Print functions
 	-floats (if time)
 3) Finish out semant
-4) For loops... (parser?)
-5) maps in codegen (& semant)
+
+4) maps in codegen (& semant)
