@@ -33,7 +33,7 @@ let translate (globals, functions) =
   and float_t    = L.double_type context
 (*   and pointer_t    = L.pointer_type context *)
   and void_t     = L.void_type   context in
-  let pointer_t = L.pointer_type in
+(*   let pointer_t = L.pointer_type in *)
   let str_t      = L.pointer_type i8_t in
 
   let point_st    = L.named_struct_type context "point_t" 
@@ -50,7 +50,7 @@ let translate (globals, functions) =
     | A.Float -> float_t
     | A.String -> str_t
     | A.Point -> point_t
-    | A.ArrayType(t) -> pointer_t (ltype_of_typ t)
+    | A.ArrayType(t) -> L.pointer_type (ltype_of_typ t)
     | t -> raise (Failure ("Type " ^ A.string_of_typ t ^ " not implemented yet"))
   in
 
@@ -136,8 +136,25 @@ let translate (globals, functions) =
     in
 
     let init_array typ len builder = 
-      L.build_array_malloc (ltype_of_typ typ) len "" builder
-    in
+      let ltype = ltype_of_typ typ in
+      let size_t = L.build_intcast (L.size_of ltype) i32_t "" builder in
+      let total_size = L.build_mul size_t len "" builder in
+      let total_size = L.build_add total_size (L.const_int i32_t 1) "" builder in
+      let arr_malloc = L.build_array_malloc ltype total_size "" builder in
+      let arr = L.build_pointercast arr_malloc (L.pointer_type ltype) "tmp" builder in
+      let _ = 
+        let assign_value i =
+          let index = L.const_int i32_t i in
+          let index = L.build_add index (L.const_int i32_t 1) "" builder in 
+          let _val = L.build_gep arr [| index |] "" builder in
+          L.build_store (List.nth list(arr) i) _val builder
+        in
+        for i = 0 to (size)-1 do
+          ignore (assign_value i)
+        done
+      in
+      arr
+      in
     
     (* Generate LLVM code for a call to Architxt's "print" *)
     let rec expr builder ((_, e) : sexpr) = match e with

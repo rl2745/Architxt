@@ -22,26 +22,20 @@ let check (globals, functions) =
                     | _ -> binding :: checked
     in let _ = List.fold_left check_it [] (List.sort compare to_check) 
        in to_check
-  in 
-  (* Raise an exception of the given rvalue type cannot be assigned to
-     the given lvalue type. (int can be assigned to float and vice versa) *)
-
-  let isNum varType = if (varType = Int || varType = Float) then true else false in 
-
-  let check_assign lValueType rValueType err =
-
-    if ((isNum lValueType) && (isNum rValueType)) then lValueType
-    else if lValueType = rValueType then lValueType else raise err
   in
 
-  let check_assign_array lval rval err = 
+  let isNum varType = if (varType = Int || varType = Float) then true else false in
+
+  let check_assign_array lval rval err =
     if lval = rval then lval else raise err
+
   in
 
-
-  let is_array_num theType err = 
+  let is_array_num theType err =
     if(isNum theType) then theType else raise err
+
   in
+
   (**** Checking Global Variables ****)
 
   let globals' = check_binds "global" globals in
@@ -99,8 +93,8 @@ let check (globals, functions) =
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
-  let type_of_identifier_array s =
-      try let id_typ = StringMap.find s symbols in 
+  let type_of_identifier_array s = 
+        try let id_typ = StringMap.find s symbols in 
         (match id_typ with
             ArrayType(t) -> t
           | _ -> id_typ
@@ -112,14 +106,14 @@ let check (globals, functions) =
       try let id_typ = StringMap.find s symbols in 
         (match id_typ with
             ArrayType(t) -> t
-          | _ -> raise (Failure (s ^ " is not an array."))
+          | _ -> raise (Failure (s ^ " is not an array!  What are you doing??"))
         )
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
     let verify_array_init t = 
       (match t with
-          Void -> raise (Failure ("Void Arrays are not allowed."))
+          Void -> raise (Failure ("The Lord does not allow void arrays..."))
         | _ -> t
       )
     in
@@ -136,7 +130,7 @@ let check (globals, functions) =
       | Assign(var, e) as ex -> 
           let lt = type_of_identifier var
           and (rt, e') = expr e in
-          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
+          let err = "illegal fucking assignment " ^ string_of_typ lt ^ " = " ^ 
             string_of_typ rt ^ " in " ^ string_of_expr ex
           in (check_assign lt rt err, SAssign(var, (rt, e')))
       | Unop(op, e) as ex -> 
@@ -190,6 +184,7 @@ let check (globals, functions) =
             raise (Failure ( "expecting string but received " ^ string_of_typ t2 ^ " in Point " ^ string_of_expr e))
           else
             (Point, SPointLit((t1, e1'), (t2, e2')))
+
       | ArrayAccess(s, e) as access -> 
           let nametype = type_of_identifier s and (indxtyp, _) = expr e 
           and check_arr arr s = match arr with
@@ -203,6 +198,7 @@ let check (globals, functions) =
             raise (Failure ("expecting array but received " ^ string_of_typ nametype ^ "in Array " ^ string_of_expr access))*)
           else 
             (check_arr nametype s, SArrayAccess(s, expr e))
+
       | ArrayAssign(s, index, e) as assign -> let nametype = type_of_identifier s 
           and (itype, _) = expr index and (etyp, _) = expr e 
           and check_arr arr s = match arr with
@@ -218,18 +214,25 @@ let check (globals, functions) =
           else let err = "expecting " ^ s ^
               " but indexing " ^ string_of_typ etyp ^ " in Array " ^ string_of_expr assign 
               in (check_assign (check_arr nametype s) etyp err, SArrayAssign(s, expr index, expr e))
-      | ArrayInit(typ, len) as init ->let (itype, _) = expr len 
+(* 
+      | ArrayInit(typ, len) as init -> let (itype, _) = expr len
           in
           if (itype != Int) then
             raise (Failure ("expecting int but received" ^ string_of_typ itype ^ " in Array " ^ string_of_expr init))
-          (*else
+          else
           if (typ != ArrayType(Point)) then
-            raise (Failure ("expecting array but received " ^ string_of_typ typ ^ " in Array " ^ string_of_expr init))*)
+            raise (Failure ("expecting array but received " ^ string_of_typ typ ^ " in Array " ^ string_of_expr init))
           else
           if (typ == Void) then
             raise (Failure ("no void arrays allowed"))
           else
-            (typ, SArrayInit(typ, expr len))
+            (typ, SArrayInit(typ, expr len)) *)
+
+
+      | ArrayInit(t, size) -> let typ = ArrayType(verify_array_init t) and len = expr size and (itype, _) = expr size in
+        ignore(is_array_num itype (Failure ("Thou must use a num-type for size when initializing an array")));
+        (typ, SArrayInit(typ, expr size))
+            
       | ArrayDelete(s) -> let nametype = type_of_identifier s 
           and check_arr arr s = match arr with
               ArrayType(t) -> t
@@ -239,6 +242,8 @@ let check (globals, functions) =
             raise (Failure ("expecting array but received " ^ string_of_typ nametype ^ " in Array " ^ string_of_expr del))
           else*)
             (check_arr nametype s, SArrayDelete(s))
+
+
       | MapInit(x, y) as map -> let (xt, xs) = expr x and (yt, ys) = expr y in
           if (xt != Int) then
             raise (Failure ( "expecting int but received " ^ string_of_typ xt ^ " in Map " ^ string_of_expr map))
