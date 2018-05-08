@@ -57,7 +57,7 @@ formal_list:
     typ ID                   { [($1,$2)]     }
   | formal_list COMMA typ ID { ($3,$4) :: $1 }
 
-typ:
+primitive:
     INT   { Int   }
   | BOOL  { Bool  }
   | FLOAT { Float }
@@ -66,6 +66,13 @@ typ:
   | POINT { Point }
   | MAP  { Map }
   /*added String and point; need to add map*/
+
+typ:
+  primitive { $1 }
+  | primitive LBRACKET RBRACKET { ArrayType($1) }
+
+
+
 
 vdecl_list:
     /* nothing */    { [] }
@@ -116,7 +123,7 @@ expr:
   | LPAREN expr RPAREN { $2                   }
   | STRLIT            { StringLit($1) }
   | point_lit { $1 }
-  | NEW typ LBRACKET expr RBRACKET  { ArrayInit($2, $4) }
+  | NEW primitive LBRACKET expr RBRACKET  { ArrayInit($2, $4) }
   | DELETE ID                             { ArrayDelete($2) }
   | ID LBRACKET expr RBRACKET ASSIGN expr { ArrayAssign($1, $3, $6) }
   | ID LBRACKET expr RBRACKET             { ArrayAccess($1, $3) }

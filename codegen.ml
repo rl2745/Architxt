@@ -31,6 +31,10 @@ let translate (globals, functions) =
   and i8_t       = L.i8_type     context 
   and i1_t       = L.i1_type     context
   and float_t    = L.double_type context
+<<<<<<< HEAD
+(*   and pointer_t    = L.pointer_type context *)
+=======
+>>>>>>> fd595d1970d9eebbe5901491ce29ed61ec2d108c
   and void_t     = L.void_type   context in
   let pointer_t = L.pointer_type in
   let str_t      = L.pointer_type i8_t in
@@ -122,14 +126,18 @@ let translate (globals, functions) =
 
     let get_array_element name i builder =
       let arr = L.build_load (lookup name) "" builder in
+<<<<<<< HEAD
+      let ptr = L.build_gep arr [| i |] "" builder in
+=======
       let ptr = L.build_gep arr [|i|] "" builder in
+>>>>>>> fd595d1970d9eebbe5901491ce29ed61ec2d108c
       L.build_load ptr "" builder
 
     in
 
-    let set_array_element  name i v builder =
+    let set_array_element name i v builder =
       let arr = L.build_load (lookup name) "" builder in
-      let ptr = L.build_gep arr [|i|] "" builder in
+      let ptr = L.build_gep arr [| i |] "" builder in
       L.build_store v ptr builder
 
     in
@@ -140,7 +148,7 @@ let translate (globals, functions) =
     
     (* Generate LLVM code for a call to Architxt's "print" *)
     let rec expr builder ((_, e) : sexpr) = match e with
-        SLiteral i -> L.const_int i32_t i (* Generate a constant integer *)
+	      SLiteral i -> L.const_int i32_t i (* Generate a constant integer *)
       | SBoolLit b -> L.const_int i1_t (if b then 1 else 0)
       | SFliteral l -> L.const_float_of_string float_t l
       | SNoexpr -> L.const_int i32_t 0
@@ -193,6 +201,10 @@ let translate (globals, functions) =
          L.build_call printf_func [| str_format_str ; (expr builder e) |]
              "printf" builder
       | SCall ("print_i", [e]) -> (* Generate a call instruction *)
+<<<<<<< HEAD
+	       L.build_call printf_func [| int_format_str ; (expr builder e) |]
+	           "printf" builder 
+=======
          L.build_call printf_func [| int_format_str ; (expr builder e) |]
              "printf" builder 
       | SCall ("print_f", [e]) -> (* Generate a call instruction *)
@@ -204,6 +216,7 @@ let translate (globals, functions) =
           let result = (match fdecl.styp with A.Void -> ""
         | _ -> f ^ "_result") in
           L.build_call fdef (Array.of_list actuals) result builder
+>>>>>>> fd595d1970d9eebbe5901491ce29ed61ec2d108c
       | SPointLit(e1, e2) -> let e1' = expr builder e1 and e2' = expr builder e2 in
         let point = L.build_alloca point_st "point" builder in
         let ptr1 = L.build_struct_gep point 0 "pointer1" builder in
