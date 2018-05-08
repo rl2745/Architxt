@@ -52,7 +52,7 @@ Language:
 	-fill
 	-display
 2) Print functions
-	-floats
+	-floats (if time)
 3) Finish out semant
-4) Arrays in codegen
+4) For loops... (parser?)
 5) maps in codegen (& semant)
