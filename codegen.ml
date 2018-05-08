@@ -123,7 +123,6 @@ let translate (globals, functions) =
 
     let get_array_element name i builder =
       let arr = L.build_load (lookup name) "" builder in
-      let ptr = L.build_gep arr [| i |] "" builder in
       let ptr = L.build_gep arr [|i|] "" builder in
       L.build_load ptr "" builder
 
@@ -197,8 +196,6 @@ let translate (globals, functions) =
       | SCall ("print_i", [e]) -> (* Generate a call instruction *)
 	       L.build_call printf_func [| int_format_str ; (expr builder e) |]
 	           "printf" builder 
-         L.build_call printf_func [| int_format_str ; (expr builder e) |]
-             "printf" builder 
       | SCall ("print_f", [e]) -> (* Generate a call instruction *)
          L.build_call printf_func [| float_format_str ; (expr builder e) |]
              "printf" builder 
