@@ -23,7 +23,25 @@ let check (globals, functions) =
     in let _ = List.fold_left check_it [] (List.sort compare to_check) 
        in to_check
   in 
+  (* Raise an exception of the given rvalue type cannot be assigned to
+     the given lvalue type. (int can be assigned to float and vice versa) *)
 
+  let isNum varType = if (varType = Int || varType = Float) then true else false in 
+
+  let check_assign lValueType rValueType err =
+
+    if ((isNum lValueType) && (isNum rValueType)) then lValueType
+    else if lValueType = rValueType then lValueType else raise err
+  in
+
+  let check_assign_array lval rval err = 
+    if lval = rval then lval else raise err
+  in
+
+
+  let is_array_num theType err = 
+    if(isNum theType) then theType else raise err
+  in
   (**** Checking Global Variables ****)
 
   let globals' = check_binds "global" globals in
@@ -79,6 +97,31 @@ let check (globals, functions) =
   let type_of_identifier s =
       try StringMap.find s symbols
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+    in
+
+  let type_of_identifier_array s =
+      try let id_typ = StringMap.find s symbols in 
+        (match id_typ with
+            ArrayType(t) -> t
+          | _ -> id_typ
+        )
+      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+    in
+
+    let verify_array s = 
+      try let id_typ = StringMap.find s symbols in 
+        (match id_typ with
+            ArrayType(t) -> t
+          | _ -> raise (Failure (s ^ " is not an array."))
+        )
+      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+    in
+
+    let verify_array_init t = 
+      (match t with
+          Void -> raise (Failure ("Void Arrays are not allowed."))
+        | _ -> t
+      )
     in
 
   (*return semantically checked expression with a type -- NEED TO ADD VARIABLE DECLARATION WHEREVER
