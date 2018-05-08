@@ -1,9 +1,58 @@
-Built in functions: 
-	propagate
-	fill
-	display
-Print functions:
-	floats
-Finish out semant (if time)
-Arrays in codegen
-maps in codegen (& semant)
+To-Do
+
+Presentation:
+
+  1) an overview of the language and its motivation,
+  2) a tutorial introduction to the language including an example or two,
+  3) a discussion of how the language was implemented, and
+  4) a summary including lessons learned.
+- Demonstration examples of how our code works. Come up with 2-3 test scripts demonstrating use of our language.
+
+The Final Report:
+
+The project report must have the following sections included:
+1. Introduction
+    * Explain the purpose and motivation of your language, its use cases, and any necessary background that I'll need to understand the point of your language.
+2. Language Tutorial
+    * A short explanation telling a novice how to use your language (consider this an informal version of a Language Reference Manual).
+3. Language Manual
+    * Include your language reference manual. Make sure it's been updated if you've made any changes since the first LRM deliverable was turned in.
+4. Project Plan
+    * Identify process used for planning, specification, and development
+    * Include a one-page programming style guide used by the team (if one was used at all)
+    * Show your project timeline
+    * Identify roles and responsibilities of each team member
+    * Describe the software development environment used (tools and languages)
+    * Include your project log
+5. Architectural Design
+    * Give block diagram showing the major components of your translator
+    * Describe the interfaces between the components
+    * State who implemented each component
+6. Test Plan
+    * Show two or three representative source language programs along with the target language program generated for each
+    * Show the test scripts used to test your translator
+    * What kind of automation was used in testing
+    * State who did what
+7. Lessons Learned
+    * Each team member should explain his or her most important takeaways from working on this project
+    * Include any advice the team has for future teams
+8. Appendix
+    * Attach a complete code listing of your translator with each module signed by its author
+    * Do not include any automatically generated files, only the sources.
+Grading
+Your final deliverables will be graded with a holistic approach, as opposed to the rubric-based grading that has been applied to previous deliverables. I'll be looking for indications that your group actually learned something about compilers and language design via this project, and that your compiler can actually handle a collection of "interesting'' (i.e., non-MicroC) programs.
+
+
+
+
+Language:
+
+1) Built in functions: 
+	-propagate
+	-fill
+	-display
+2) Print functions
+	-floats
+3) Finish out semant
+4) Arrays in codegen
+5) maps in codegen (& semant)
