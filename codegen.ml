@@ -2,16 +2,11 @@
 
 (* Code generation: translate takes a semantically checked AST and
 produces LLVM IR
-
 LLVM tutorial: Make sure to read the OCaml version of the tutorial
-
 http://llvm.org/docs/tutorial/index.html
-
 Detailed documentation on the OCaml LLVM library:
-
 http://llvm.moe/
 http://llvm.moe/ocaml/
-
 *)
 
 (* We'll refer to Llvm and Ast constructs with module names *)
@@ -123,7 +118,7 @@ let translate (globals, functions) =
 
     let get_array_element name i builder =
       let arr = L.build_load (lookup name) "" builder in
-      let ptr = L.build_gep arr [|i|] "" builder in
+      let ptr = L.build_gep arr [| i |] "" builder in
       L.build_load ptr "" builder
 
     in
@@ -136,29 +131,14 @@ let translate (globals, functions) =
     in
 
     let init_array typ len builder = 
-      let ltype = ltype_of_typ typ in
-      let size_t = L.build_intcast (L.size_of ltype) i32_t "" builder in
-      let total_size = L.build_mul size_t len "" builder in
-      let total_size = L.build_add total_size (L.const_int i32_t 1) "" builder in
-      let arr_malloc = L.build_array_malloc ltype total_size "" builder in
-      let arr = L.build_pointercast arr_malloc (L.pointer_type ltype) "tmp" builder in
-      let _ = 
-        let assign_value i =
-          let index = L.const_int i32_t i in
-          let index = L.build_add index (L.const_int i32_t 1) "" builder in 
-          let _val = L.build_gep arr [| index |] "" builder in
-          L.build_store (List.nth list(arr) i) _val builder
-        in
-        for i = 0 to (size)-1 do
-          ignore (assign_value i)
-        done
-      in
+      let arr_malloc = L.build_array_malloc (ltype_of_typ typ) len "tmp" builder in
+      let arr = L.build_pointercast arr_malloc (ltype_of_typ typ) "tmp" builder in
       arr
-      in
+    in
     
     (* Generate LLVM code for a call to Architxt's "print" *)
     let rec expr builder ((_, e) : sexpr) = match e with
-	      SLiteral i -> L.const_int i32_t i (* Generate a constant integer *)
+        SLiteral i -> L.const_int i32_t i (* Generate a constant integer *)
       | SBoolLit b -> L.const_int i1_t (if b then 1 else 0)
       | SFliteral l -> L.const_float_of_string float_t l
       | SNoexpr -> L.const_int i32_t 0
@@ -211,8 +191,8 @@ let translate (globals, functions) =
          L.build_call printf_func [| str_format_str ; (expr builder e) |]
              "printf" builder
       | SCall ("print_i", [e]) -> (* Generate a call instruction *)
-	       L.build_call printf_func [| int_format_str ; (expr builder e) |]
-	           "printf" builder 
+         L.build_call printf_func [| int_format_str ; (expr builder e) |]
+             "printf" builder 
       | SCall ("print_f", [e]) -> (* Generate a call instruction *)
          L.build_call printf_func [| float_format_str ; (expr builder e) |]
              "printf" builder 
