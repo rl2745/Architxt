@@ -26,10 +26,6 @@ let check (globals, functions) =
 
   let isNum varType = if (varType = Int || varType = Float) then true else false in
 
-  let check_assign_array lval rval err =
-    if lval = rval then lval else raise err
-
-  in
 
   let is_array_num theType err =
     if(isNum theType) then theType else raise err
@@ -90,24 +86,6 @@ let check (globals, functions) =
   (*return local variable from local symbol table*)
   let type_of_identifier s =
       try StringMap.find s symbols
-      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
-    in
-
-  let type_of_identifier_array s = 
-        try let id_typ = StringMap.find s symbols in 
-        (match id_typ with
-            ArrayType(t) -> t
-          | _ -> id_typ
-        )
-      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
-    in
-
-    let verify_array s = 
-      try let id_typ = StringMap.find s symbols in 
-        (match id_typ with
-            ArrayType(t) -> t
-          | _ -> raise (Failure (s ^ " is not an array!  What are you doing??"))
-        )
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
@@ -214,22 +192,8 @@ let check (globals, functions) =
           else let err = "expecting " ^ s ^
               " but indexing " ^ string_of_typ etyp ^ " in Array " ^ string_of_expr assign 
               in (check_assign (check_arr nametype s) etyp err, SArrayAssign(s, expr index, expr e))
-(* 
-      | ArrayInit(typ, len) as init -> let (itype, _) = expr len
-          in
-          if (itype != Int) then
-            raise (Failure ("expecting int but received" ^ string_of_typ itype ^ " in Array " ^ string_of_expr init))
-          else
-          if (typ != ArrayType(Point)) then
-            raise (Failure ("expecting array but received " ^ string_of_typ typ ^ " in Array " ^ string_of_expr init))
-          else
-          if (typ == Void) then
-            raise (Failure ("no void arrays allowed"))
-          else
-            (typ, SArrayInit(typ, expr len)) *)
 
-
-      | ArrayInit(t, size) -> let typ = ArrayType(verify_array_init t) and len = expr size and (itype, _) = expr size in
+      | ArrayInit(t, size) -> let typ = ArrayType(verify_array_init t) and (itype, _) = expr size in
         ignore(is_array_num itype (Failure ("Thou must use a num-type for size when initializing an array")));
         (typ, SArrayInit(typ, expr size))
             
