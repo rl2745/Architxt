@@ -74,6 +74,7 @@ typ:
 
 
 
+
 vdecl_list:
     /* nothing */    { [] }
   | vdecl_list vdecl { $2 :: $1 }
@@ -127,7 +128,8 @@ expr:
   | DELETE ID                             { ArrayDelete($2) }
   | ID LBRACKET expr RBRACKET ASSIGN expr { ArrayAssign($1, $3, $6) }
   | ID LBRACKET expr RBRACKET             { ArrayAccess($1, $3) }
-  | map_init { $1 }
+  | NEW primitive LBRACKET expr COMMA expr RBRACKET { MapInit($4, $6)}
+  /*| map_init { $1 }*/
   | ID PERIOD SURFACE ASSIGN expr            { PointAssign($1, Surface, $5)}
   | ID PERIOD SURFACE                        { PointAccess($1, Surface)}
   | ID PERIOD NAME ASSIGN expr               { PointAssign($1, Name, $5)}
@@ -148,7 +150,7 @@ args_list:
 point_lit:
     LPAREN expr COMMA expr RPAREN    { PointLit($2, $4)}
 
-map_init:
-    LBRACKET expr COMMA expr RBRACKET { MapInit($2, $4)}
+/*map_init:
+    NEW primitive LBRACKET expr COMMA expr RBRACKET { MapInit($2, $4)}*/
 
   /*need to add point and map specific stuff*/

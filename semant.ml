@@ -215,6 +215,7 @@ let check (globals, functions) =
           if (yt != Int) then
             raise (Failure ( "expecting int but received " ^ string_of_typ yt ^ " in Map " ^ string_of_expr map))
           else (Map, SMapInit((xt, xs), (yt, ys)))
+          
       | PointAssign(s, p, e) as point -> let nametype = type_of_identifier s and (etype, setype) = expr e in
         if (nametype != Point) then
           raise (Failure ( string_of_typ nametype ^ "is not a Point"))
