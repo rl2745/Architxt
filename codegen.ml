@@ -152,22 +152,28 @@ let translate (globals, functions) =
  (*    in *)
 
       let init_map x y builder =
+      let point_arrays = init_array A.Point x builder in
+      let map_alloc = init_array A.Map y builder in
+      map_alloc
+    in
+
+
 (*         let total_memory = x*y in  *)
 (*         let total_memory_1 = expr builder total_memory in *)
-        let a1 = init_array (A.ArrayType(A.ArrayType(A.Point))) x builder in
+  (*       let a1 = init_array (A.ArrayType(A.ArrayType(A.Point))) x builder in
 (*         let a2 = init_array A.Int y builder in *)
         a1
       in
 
+      let set_map_element id e1 e2 e3 builder =
+        let my_map = L.build_load (lookup id) "" builder in
+        let ptr = L.build_gep my_map [| e1 |][| e2 |] "" builder in
+        L.build_store e3 ptr builder
 
-  (*         | MapInit(x, y) as map -> let (xt, xs) = expr x and (yt, ys) = expr y in
-          if (xt != Int) then
-            raise (Failure ( "expecting int but received " ^ string_of_typ xt ^ " in Map " ^ string_of_expr map))
-          else
-          if (yt != Int) then
-            raise (Failure ( "expecting int but received " ^ string_of_typ yt ^ " in Map " ^ string_of_expr map))
-          else (Map, SMapInit((xt, xs), (yt, ys)))
+      in
  *)
+
+
 
     (* we need init_map, set_map_element, and get_map_element *)
     
@@ -187,6 +193,8 @@ let translate (globals, functions) =
       | SArrayAssign(s, lhs, rhs) -> set_array_element s (expr builder lhs) (expr builder rhs) builder
 
       | SMapInit(e1, e2) -> let x = (expr builder e1) in let y = (expr builder e2) in init_map x y builder
+
+      (* |SMapAssign(id, e1, e2, e3) -> set_map_element id (expr builder e1) (expr builder e2) (expr builder e3) builder *)
 
       | SBinop (e1, op, e2) ->
           let (t, _) = e1
