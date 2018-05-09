@@ -35,6 +35,7 @@ let translate (globals, functions) =
     in let _ = L.struct_set_body point_st [|i1_t; str_t|] true in
     let point_t = L.pointer_type point_st in
 
+
   (* Create an LLVM module -- this is a "container" into which we'll 
      generate actual code *)
   (* Convert Architxt types to LLVM types *)
@@ -160,11 +161,22 @@ let translate (globals, functions) =
 
 
       let set_map_element id e1 e2 e3 builder =
+ (*      let e3' = expr builder e3 in *)
+        let point = L.build_alloca point_st "point" builder in
+        let ptr1 = L.build_struct_gep point 0 "pointer1" builder in
+        let f_point = ignore(L.build_store e3 ptr1 builder); point in
+
+     (*    let my_point = L.build_load (lookup e3) "E3" builder in *)
+        (* let inner_arr = L.build_array_malloc (ltype_of_type typ) e1 "tmp" builder in *)
+(*         let outer_arr = L.build_array_malloc  *)
+        
+
         let my_map = L.build_load (lookup id) "Access1" builder in
         let pointer_to_parrays = L.build_gep my_map [| e1 |] "" builder in
         let my_point_array = L.build_load pointer_to_parrays "Access1" builder in
-        let pointer_to_points = L.build_gep my_point_array [| e2 |] "" builder in
-        L.build_store e3 pointer_to_points builder
+        let pointer_to_points = L.build_gep pointer_to_parrays [| e2 |] "" builder in
+        L.build_store f_point pointer_to_points builder
+
 
     in
 
