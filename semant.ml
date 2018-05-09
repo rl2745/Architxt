@@ -108,7 +108,7 @@ let check (globals, functions) =
       | Assign(var, e) as ex -> 
           let lt = type_of_identifier var
           and (rt, e') = expr e in
-          let err = "illegal fucking assignment " ^ string_of_typ lt ^ " = " ^ 
+          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
             string_of_typ rt ^ " in " ^ string_of_expr ex
           in (check_assign lt rt err, SAssign(var, (rt, e')))
       | Unop(op, e) as ex -> 
@@ -194,7 +194,7 @@ let check (globals, functions) =
               in (check_assign (check_arr nametype s) etyp err, SArrayAssign(s, expr index, expr e))
 
       | ArrayInit(t, size) -> let typ = ArrayType(verify_array_init t) and (itype, _) = expr size in
-        ignore(is_array_num itype (Failure ("Thou must use a num-type for size when initializing an array")));
+        ignore(is_array_num itype (Failure ("U must use a num-type for size when initializing an array")));
         (typ, SArrayInit(typ, expr size))
             
       | ArrayDelete(s) -> let nametype = type_of_identifier s 

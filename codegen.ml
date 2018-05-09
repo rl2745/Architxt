@@ -46,7 +46,9 @@ let translate (globals, functions) =
     | A.String -> str_t
     | A.Point -> point_t
     | A.ArrayType(t) -> L.pointer_type (ltype_of_typ t)
+    | A.Map -> L.pointer_type (L.pointer_type (point_t))
     | t -> raise (Failure ("Type " ^ A.string_of_typ t ^ " not implemented yet"))
+    (* add map to this? *)
   in
 
   (* Declare each global variable; remember its value in a map *)
@@ -135,6 +137,39 @@ let translate (globals, functions) =
       let arr = L.build_pointercast arr_malloc (ltype_of_typ typ) "tmp" builder in
       arr
     in
+
+(*    let init_map x y builder = 
+      let arr1 = init_array int x builder in
+      let arr2 = init_array int y builder in
+      arr1, *)
+
+
+(*       let arr_malloc1 = L.build_array_malloc(i32_t) x "tmp" builder in
+      let arr_malloc2 = L.build_array_malloc(i32_t) y "tmp" builder in
+      let arr1 = L.build_pointercast arr_malloc1 (i32_t) "tmp" builder in
+      let arr2 = L.build_pointercast arr_malloc2 (i32_t) "tmp" builder in
+      i32_t, arr1, i32_t, arr2 *)
+ (*    in *)
+
+      let init_map x y builder =
+(*         let total_memory = x*y in  *)
+(*         let total_memory_1 = expr builder total_memory in *)
+        let a1 = init_array (A.ArrayType(A.Point)) x builder in
+(*         let a2 = init_array A.Int y builder in *)
+        a1
+      in
+
+
+  (*         | MapInit(x, y) as map -> let (xt, xs) = expr x and (yt, ys) = expr y in
+          if (xt != Int) then
+            raise (Failure ( "expecting int but received " ^ string_of_typ xt ^ " in Map " ^ string_of_expr map))
+          else
+          if (yt != Int) then
+            raise (Failure ( "expecting int but received " ^ string_of_typ yt ^ " in Map " ^ string_of_expr map))
+          else (Map, SMapInit((xt, xs), (yt, ys)))
+ *)
+
+    (* we need init_map, set_map_element, and get_map_element *)
     
     (* Generate LLVM code for a call to Architxt's "print" *)
     let rec expr builder ((_, e) : sexpr) = match e with
@@ -150,6 +185,12 @@ let translate (globals, functions) =
       | SArrayInit(typ, e) -> let len = (expr builder e) in init_array typ len builder
       | SArrayDelete(s) -> L.build_free (L.build_load (lookup s) "" builder) builder
       | SArrayAssign(s, lhs, rhs) -> set_array_element s (expr builder lhs) (expr builder rhs) builder
+
+      | SMapInit(e1, e2) ->
+      (* let total_memory = e1 A.Mult e2 in let tm = (expr builder total_memory) in init_map tm builder *)
+
+      let x = (expr builder e1) in let y = (expr builder e2) in init_map x y builder
+
       | SBinop (e1, op, e2) ->
           let (t, _) = e1
           and e1' = expr builder e1
