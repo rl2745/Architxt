@@ -158,20 +158,20 @@ let translate (globals, functions) =
     in
 
 
-(*         let total_memory = x*y in  *)
-(*         let total_memory_1 = expr builder total_memory in *)
-  (*       let a1 = init_array (A.ArrayType(A.ArrayType(A.Point))) x builder in
-(*         let a2 = init_array A.Int y builder in *)
-        a1
-      in
 
       let set_map_element id e1 e2 e3 builder =
         let my_map = L.build_load (lookup id) "" builder in
-        let ptr = L.build_gep my_map [| e1 |][| e2 |] "" builder in
-        L.build_store e3 ptr builder
+        let pointer_to_parrays = L.build_gep my_map [| e1 |] "" builder in
+        let pointer_to_points = L.build_gep pointer_to_parrays [| e2 |] "" builder in
+        L.build_store e3 pointer_to_points builder
 
-      in
- *)
+    in
+
+
+
+ 
+
+
 
 
 
@@ -194,7 +194,7 @@ let translate (globals, functions) =
 
       | SMapInit(e1, e2) -> let x = (expr builder e1) in let y = (expr builder e2) in init_map x y builder
 
-      (* |SMapAssign(id, e1, e2, e3) -> set_map_element id (expr builder e1) (expr builder e2) (expr builder e3) builder *)
+      |SMapAssign(id, e1, e2, e3) -> set_map_element id (expr builder e1) (expr builder e2) (expr builder e3) builder
 
       | SBinop (e1, op, e2) ->
           let (t, _) = e1
