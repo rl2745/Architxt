@@ -160,9 +160,10 @@ let translate (globals, functions) =
 
 
       let set_map_element id e1 e2 e3 builder =
-        let my_map = L.build_load (lookup id) "" builder in
+        let my_map = L.build_load (lookup id) "Access1" builder in
         let pointer_to_parrays = L.build_gep my_map [| e1 |] "" builder in
-        let pointer_to_points = L.build_gep pointer_to_parrays [| e2 |] "" builder in
+        let my_point_array = L.build_load pointer_to_parrays "Access1" builder in
+        let pointer_to_points = L.build_gep my_point_array [| e2 |] "" builder in
         L.build_store e3 pointer_to_points builder
 
     in
