@@ -6,14 +6,12 @@ Tristan Orlofski (tio2001@columbia.edu) - Language Guru
 This has been tested on and works on LLVM 3.8
 
 Compliation Instructions:
-    - run $make and this creates toplevel.native
-    - to execute a program, run ./toplevel.native____.arc where ____ is an .arc file. this will produce an llvm output
-    - to test the program, run ./testall.sh
+    - run $make and this compiles our language and creates the toplevel.native executable
+    - to execute a program, run ./toplevel.native  ____.arc where ____ is an .arc file. this will produce an llvm output
+    - to test all the the test programs, run ./testall2.sh
         this should output the testname and OK or FAILED with a message (depending upon the results). It will also produce a testall.log with commands that it executed and where exactly it failed.
 
-TO-DO:
-
-Points have been added, though array and maps need to be added. It should not throw any warnings when using $make command.
+Test Suite:
 
 test-array - tests array assignment, intialization, and setting an array index 
   to a value
