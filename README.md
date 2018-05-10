@@ -13,6 +13,11 @@ Compliation Instructions:
 
 Test Suite:
 
+test-array3 - Tests for loops, array assignment and access, and print integers functions. Succesfull.
+test-array2 - Uses 2 for loops to test array assignment and access.
+test-array1 - Tests array creation, assignment, and access.
+test-maparray - Succesfully creates a map of size 8x10.
+test-mapassign - Creates map, and a point and tests assignment of point in map. Because of not fully implemented map module, test seg-faults.
 test-array - tests array assignment, intialization, and setting an array index 
   to a value
 test-bool = tests initialization and assignment of a boolean
